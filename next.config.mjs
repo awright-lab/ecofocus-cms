@@ -14,12 +14,12 @@ const nextConfig = {
       '.mjs': ['.mts', '.mjs'],
     }
 
-    // ✅ Add alias so Next.js can resolve @payload-config
+    // ✅ Add these aliases for Next.js build on Render
     webpackConfig.resolve.alias['@payload-config'] = path.resolve(
       __dirname,
       'src/payload.config.ts',
     )
-
+    webpackConfig.resolve.alias['@'] = path.resolve(__dirname, 'src')
 
     return webpackConfig
   },
