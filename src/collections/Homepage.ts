@@ -6,7 +6,10 @@ const Homepage: CollectionConfig = {
     useAsTitle: 'title',
   },
   access: {
-    read: () => true, // Public
+    read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: () => true,
   },
   fields: [
     {
@@ -15,7 +18,6 @@ const Homepage: CollectionConfig = {
       label: 'Page Title',
       required: true,
     },
-    // Hero Section
     {
       name: 'hero',
       type: 'group',
@@ -46,7 +48,6 @@ const Homepage: CollectionConfig = {
         },
       ],
     },
-    // Quick Stats
     {
       name: 'quickStats',
       type: 'array',
@@ -56,7 +57,6 @@ const Homepage: CollectionConfig = {
         { name: 'description', type: 'text', required: true },
       ],
     },
-    // Featured Report
     {
       name: 'featuredReport',
       type: 'group',
@@ -74,7 +74,6 @@ const Homepage: CollectionConfig = {
         },
       ],
     },
-    // Solutions / Dashboard Section
     {
       name: 'solutions',
       type: 'group',
@@ -91,13 +90,11 @@ const Homepage: CollectionConfig = {
         },
       ],
     },
-    // EcoNugget Insights (Dynamic via Posts Collection)
     {
       name: 'ecoNuggetsHeading',
       type: 'text',
       label: 'EcoNuggets Section Heading',
     },
-    // Why Choose EcoFocus
     {
       name: 'whyChoose',
       type: 'array',
@@ -107,7 +104,6 @@ const Homepage: CollectionConfig = {
         { name: 'description', type: 'textarea' },
       ],
     },
-    // Trusted Partners
     {
       name: 'trustedPartners',
       type: 'array',
@@ -120,7 +116,6 @@ const Homepage: CollectionConfig = {
         },
       ],
     },
-    // CTA Banner
     {
       name: 'ctaBanner',
       type: 'group',
