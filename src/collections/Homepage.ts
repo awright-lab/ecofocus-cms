@@ -2,6 +2,10 @@ import { CollectionConfig } from 'payload'
 
 const Homepage: CollectionConfig = {
   slug: 'homepage',
+  labels: {
+    singular: 'Homepage',
+    plural: 'Homepage',
+  },
   admin: {
     useAsTitle: 'title',
   },
@@ -23,13 +27,8 @@ const Homepage: CollectionConfig = {
       type: 'blocks',
       label: 'Homepage Layout',
       blocks: [
-        // Hero Block
         {
           slug: 'hero',
-          labels: {
-            singular: 'Hero Section',
-            plural: 'Hero Sections',
-          },
           fields: [
             { name: 'headline', type: 'text', required: true },
             { name: 'subheadline', type: 'textarea' },
@@ -46,7 +45,6 @@ const Homepage: CollectionConfig = {
             {
               name: 'ctaButtons',
               type: 'array',
-              label: 'Hero CTAs',
               fields: [
                 { name: 'label', type: 'text', required: true },
                 { name: 'url', type: 'text', required: true },
@@ -54,31 +52,21 @@ const Homepage: CollectionConfig = {
             },
           ],
         },
-        // Quick Stats Block
         {
           slug: 'quickStats',
-          labels: {
-            singular: 'Quick Stats',
-            plural: 'Quick Stats',
-          },
           fields: [
             {
               name: 'stats',
               type: 'array',
               fields: [
-                { name: 'value', type: 'text', required: true },
-                { name: 'description', type: 'text', required: true },
+                { name: 'value', type: 'text' },
+                { name: 'description', type: 'text' },
               ],
             },
           ],
         },
-        // Featured Report Block
         {
           slug: 'featuredReport',
-          labels: {
-            singular: 'Featured Report',
-            plural: 'Featured Reports',
-          },
           fields: [
             { name: 'title', type: 'text' },
             { name: 'description', type: 'textarea' },
@@ -92,13 +80,8 @@ const Homepage: CollectionConfig = {
             },
           ],
         },
-        // Dashboard Promo Block
         {
           slug: 'dashboardPromo',
-          labels: {
-            singular: 'Dashboard Promo',
-            plural: 'Dashboard Promos',
-          },
           fields: [
             { name: 'headline', type: 'text' },
             { name: 'description', type: 'textarea' },
@@ -111,25 +94,15 @@ const Homepage: CollectionConfig = {
             },
           ],
         },
-        // EcoNugget Insights Block
         {
           slug: 'ecoNuggets',
-          labels: {
-            singular: 'EcoNugget Insights',
-            plural: 'EcoNugget Insights',
-          },
           fields: [
             { name: 'heading', type: 'text' },
             { name: 'description', type: 'textarea' },
           ],
         },
-        // Why Choose Block
         {
           slug: 'whyChoose',
-          labels: {
-            singular: 'Why Choose EcoFocus',
-            plural: 'Why Choose EcoFocus Sections',
-          },
           fields: [
             {
               name: 'items',
@@ -141,13 +114,8 @@ const Homepage: CollectionConfig = {
             },
           ],
         },
-        // Trusted By Block
         {
           slug: 'trustedBy',
-          labels: {
-            singular: 'Trusted By',
-            plural: 'Trusted By Sections',
-          },
           fields: [
             {
               name: 'logos',
@@ -162,13 +130,8 @@ const Homepage: CollectionConfig = {
             },
           ],
         },
-        // Call To Action Block
         {
           slug: 'callToAction',
-          labels: {
-            singular: 'Call To Action',
-            plural: 'Call To Action Sections',
-          },
           fields: [
             { name: 'text', type: 'text' },
             { name: 'buttonLabel', type: 'text' },
