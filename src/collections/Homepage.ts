@@ -1,10 +1,10 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
 
-const Homepage: CollectionConfig = {
+export const Homepage: CollectionConfig = {
   slug: 'homepage',
   labels: {
     singular: 'Homepage',
-    plural: 'Homepage',
+    plural: 'Homepages',
   },
   admin: {
     useAsTitle: 'title',
@@ -23,5 +23,3 @@ const Homepage: CollectionConfig = {
     },
   ],
 }
-
-export default Homepage
