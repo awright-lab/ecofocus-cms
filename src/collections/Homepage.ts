@@ -19,111 +19,162 @@ const Homepage: CollectionConfig = {
       required: true,
     },
     {
-      name: 'hero',
-      type: 'group',
-      label: 'Hero Section',
-      fields: [
-        { name: 'headline', type: 'text', required: true },
-        { name: 'subheadline', type: 'textarea' },
+      name: 'layout',
+      type: 'blocks',
+      label: 'Homepage Layout',
+      blocks: [
+        // Hero Block
         {
-          name: 'backgroundVideo',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Hero Background Video',
-        },
-        {
-          name: 'backgroundImage',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Hero Background Image',
-        },
-        {
-          name: 'ctaButtons',
-          type: 'array',
-          label: 'Hero CTAs',
+          slug: 'hero',
+          labels: {
+            singular: 'Hero Section',
+            plural: 'Hero Sections',
+          },
           fields: [
-            { name: 'label', type: 'text', required: true },
-            { name: 'url', type: 'text', required: true },
+            { name: 'headline', type: 'text', required: true },
+            { name: 'subheadline', type: 'textarea' },
+            {
+              name: 'backgroundImage',
+              type: 'upload',
+              relationTo: 'media',
+            },
+            {
+              name: 'backgroundVideo',
+              type: 'upload',
+              relationTo: 'media',
+            },
+            {
+              name: 'ctaButtons',
+              type: 'array',
+              label: 'Hero CTAs',
+              fields: [
+                { name: 'label', type: 'text', required: true },
+                { name: 'url', type: 'text', required: true },
+              ],
+            },
           ],
         },
-      ],
-    },
-    {
-      name: 'quickStats',
-      type: 'array',
-      label: 'Quick Stats',
-      fields: [
-        { name: 'value', type: 'text', required: true },
-        { name: 'description', type: 'text', required: true },
-      ],
-    },
-    {
-      name: 'featuredReport',
-      type: 'group',
-      label: 'Featured Report',
-      fields: [
-        { name: 'title', type: 'text' },
-        { name: 'description', type: 'textarea' },
-        { name: 'price', type: 'text' },
-        { name: 'ctaLabel', type: 'text' },
-        { name: 'ctaUrl', type: 'text' },
+        // Quick Stats Block
         {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
+          slug: 'quickStats',
+          labels: {
+            singular: 'Quick Stats',
+            plural: 'Quick Stats',
+          },
+          fields: [
+            {
+              name: 'stats',
+              type: 'array',
+              fields: [
+                { name: 'value', type: 'text', required: true },
+                { name: 'description', type: 'text', required: true },
+              ],
+            },
+          ],
         },
-      ],
-    },
-    {
-      name: 'solutions',
-      type: 'group',
-      label: 'Solutions Section',
-      fields: [
-        { name: 'headline', type: 'text' },
-        { name: 'description', type: 'textarea' },
-        { name: 'ctaLabel', type: 'text' },
-        { name: 'ctaUrl', type: 'text' },
+        // Featured Report Block
         {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
+          slug: 'featuredReport',
+          labels: {
+            singular: 'Featured Report',
+            plural: 'Featured Reports',
+          },
+          fields: [
+            { name: 'title', type: 'text' },
+            { name: 'description', type: 'textarea' },
+            { name: 'price', type: 'text' },
+            { name: 'ctaLabel', type: 'text' },
+            { name: 'ctaUrl', type: 'text' },
+            {
+              name: 'image',
+              type: 'upload',
+              relationTo: 'media',
+            },
+          ],
         },
-      ],
-    },
-    {
-      name: 'ecoNuggetsHeading',
-      type: 'text',
-      label: 'EcoNuggets Section Heading',
-    },
-    {
-      name: 'whyChoose',
-      type: 'array',
-      label: 'Why Choose EcoFocus',
-      fields: [
-        { name: 'title', type: 'text' },
-        { name: 'description', type: 'textarea' },
-      ],
-    },
-    {
-      name: 'trustedPartners',
-      type: 'array',
-      label: 'Trusted Partners',
-      fields: [
+        // Dashboard Promo Block
         {
-          name: 'logo',
-          type: 'upload',
-          relationTo: 'media',
+          slug: 'dashboardPromo',
+          labels: {
+            singular: 'Dashboard Promo',
+            plural: 'Dashboard Promos',
+          },
+          fields: [
+            { name: 'headline', type: 'text' },
+            { name: 'description', type: 'textarea' },
+            { name: 'ctaLabel', type: 'text' },
+            { name: 'ctaUrl', type: 'text' },
+            {
+              name: 'image',
+              type: 'upload',
+              relationTo: 'media',
+            },
+          ],
         },
-      ],
-    },
-    {
-      name: 'ctaBanner',
-      type: 'group',
-      label: 'CTA Banner',
-      fields: [
-        { name: 'text', type: 'text' },
-        { name: 'buttonLabel', type: 'text' },
-        { name: 'buttonUrl', type: 'text' },
+        // EcoNugget Insights Block
+        {
+          slug: 'ecoNuggets',
+          labels: {
+            singular: 'EcoNugget Insights',
+            plural: 'EcoNugget Insights',
+          },
+          fields: [
+            { name: 'heading', type: 'text' },
+            { name: 'description', type: 'textarea' },
+          ],
+        },
+        // Why Choose Block
+        {
+          slug: 'whyChoose',
+          labels: {
+            singular: 'Why Choose EcoFocus',
+            plural: 'Why Choose EcoFocus Sections',
+          },
+          fields: [
+            {
+              name: 'items',
+              type: 'array',
+              fields: [
+                { name: 'title', type: 'text' },
+                { name: 'description', type: 'textarea' },
+              ],
+            },
+          ],
+        },
+        // Trusted By Block
+        {
+          slug: 'trustedBy',
+          labels: {
+            singular: 'Trusted By',
+            plural: 'Trusted By Sections',
+          },
+          fields: [
+            {
+              name: 'logos',
+              type: 'array',
+              fields: [
+                {
+                  name: 'logo',
+                  type: 'upload',
+                  relationTo: 'media',
+                },
+              ],
+            },
+          ],
+        },
+        // Call To Action Block
+        {
+          slug: 'callToAction',
+          labels: {
+            singular: 'Call To Action',
+            plural: 'Call To Action Sections',
+          },
+          fields: [
+            { name: 'text', type: 'text' },
+            { name: 'buttonLabel', type: 'text' },
+            { name: 'buttonUrl', type: 'text' },
+          ],
+        },
       ],
     },
   ],
