@@ -4,7 +4,7 @@ export const Homepage: CollectionConfig = {
   slug: 'homepage',
   labels: {
     singular: 'Homepage',
-    plural: 'Homepages',
+    plural: 'Homepage',
   },
   admin: {
     useAsTitle: 'title',
@@ -30,8 +30,15 @@ export const Homepage: CollectionConfig = {
           slug: 'hero',
           labels: { singular: 'Hero Section', plural: 'Hero Sections' },
           fields: [
-            { name: 'headline', type: 'text', required: true },
-            { name: 'subheadline', type: 'textarea' },
+            {
+              name: 'headline',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'subheadline',
+              type: 'textarea',
+            },
             {
               name: 'backgroundImage',
               type: 'upload',
@@ -60,7 +67,6 @@ export const Homepage: CollectionConfig = {
             {
               name: 'stats',
               type: 'array',
-              label: 'Stats',
               fields: [
                 { name: 'value', type: 'text', required: true },
                 { name: 'description', type: 'text', required: true },
@@ -77,46 +83,37 @@ export const Homepage: CollectionConfig = {
             { name: 'price', type: 'text' },
             { name: 'ctaLabel', type: 'text' },
             { name: 'ctaUrl', type: 'text' },
-            {
-              name: 'image',
-              type: 'upload',
-              relationTo: 'media',
-            },
+            { name: 'image', type: 'upload', relationTo: 'media' },
           ],
         },
         {
           slug: 'dashboardPromo',
           labels: { singular: 'Dashboard Promo', plural: 'Dashboard Promos' },
           fields: [
-            { name: 'headline', type: 'text', required: true },
+            { name: 'headline', type: 'text' },
             { name: 'description', type: 'textarea' },
             { name: 'ctaLabel', type: 'text' },
             { name: 'ctaUrl', type: 'text' },
-            {
-              name: 'image',
-              type: 'upload',
-              relationTo: 'media',
-            },
+            { name: 'image', type: 'upload', relationTo: 'media' },
           ],
         },
         {
           slug: 'ecoNuggets',
           labels: { singular: 'EcoNuggets', plural: 'EcoNuggets' },
           fields: [
-            { name: 'heading', type: 'text', required: true },
+            { name: 'heading', type: 'text' },
             { name: 'description', type: 'textarea' },
           ],
         },
         {
           slug: 'whyChoose',
-          labels: { singular: 'Why Choose', plural: 'Why Choose Sections' },
+          labels: { singular: 'Why Choose', plural: 'Why Choose' },
           fields: [
             {
               name: 'items',
               type: 'array',
-              label: 'Why Choose Items',
               fields: [
-                { name: 'title', type: 'text', required: true },
+                { name: 'title', type: 'text' },
                 { name: 'description', type: 'textarea' },
               ],
             },
@@ -124,12 +121,11 @@ export const Homepage: CollectionConfig = {
         },
         {
           slug: 'trustedBy',
-          labels: { singular: 'Trusted By', plural: 'Trusted By Sections' },
+          labels: { singular: 'Trusted By', plural: 'Trusted By' },
           fields: [
             {
               name: 'logos',
               type: 'array',
-              label: 'Logos',
               fields: [
                 {
                   name: 'logo',
@@ -142,11 +138,11 @@ export const Homepage: CollectionConfig = {
         },
         {
           slug: 'callToAction',
-          labels: { singular: 'Call To Action', plural: 'Call To Actions' },
+          labels: { singular: 'CTA Banner', plural: 'CTA Banners' },
           fields: [
-            { name: 'text', type: 'text', required: true },
-            { name: 'buttonLabel', type: 'text', required: true },
-            { name: 'buttonUrl', type: 'text', required: true },
+            { name: 'text', type: 'text' },
+            { name: 'buttonLabel', type: 'text' },
+            { name: 'buttonUrl', type: 'text' },
           ],
         },
       ],
