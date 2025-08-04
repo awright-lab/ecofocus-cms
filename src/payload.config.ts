@@ -15,6 +15,8 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || '', // optional, helps in URLs
+  debug: true, // ✅ Enable debug to see DB queries & Payload logs
   admin: {
     user: Users.slug,
     importMap: {
@@ -28,10 +30,11 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
+    migrationDir: path.resolve(dirname, 'migrations'), // ✅ Enable migrations folder
     pool: {
       connectionString: process.env.DATABASE_URL || '',
       ssl: {
-        rejectUnauthorized: false,
+        rejectUnauthorized: false, // ✅ Required for Render Postgres
       },
     },
   }),
