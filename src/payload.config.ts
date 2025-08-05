@@ -22,6 +22,18 @@ import { ApiKeys } from './collections/ApiKeys'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Debug log for Render deploy
+console.log('Cloudflare Config:', {
+  bucket: process.env.S3_BUCKET,
+  endpoint: process.env.S3_ENDPOINT,
+  accessKeyId: !!process.env.S3_ACCESS_KEY_ID,
+  secretKey: !!process.env.S3_SECRET_ACCESS_KEY,
+})
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is missing. Check your Render environment variables.')
+}
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -66,16 +78,17 @@ export default buildConfig({
     payloadCloudPlugin(),
     s3Storage({
       collections: {
-        media: true,
+        media: true, // Enable R2 storage for Media collection
       },
       bucket: process.env.S3_BUCKET || '',
       config: {
         endpoint: process.env.S3_ENDPOINT || '',
+        region: process.env.S3_REGION || 'auto',
         credentials: {
           accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
           secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
         },
-        region: process.env.S3_REGION || 'auto',
+        forcePathStyle: true, // Required for Cloudflare R2
       },
     }),
   ],
