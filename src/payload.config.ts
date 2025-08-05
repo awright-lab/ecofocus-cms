@@ -22,13 +22,19 @@ import { ApiKeys } from './collections/ApiKeys'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// Debug log for Render deploy
+// Debug for Render deployment
+console.log('==============================')
+console.log('DEBUG: Environment Variables')
+console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'SET' : 'MISSING')
+console.log('PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET ? 'SET' : 'MISSING')
 console.log('Cloudflare Config:', {
-  bucket: process.env.S3_BUCKET,
-  endpoint: process.env.S3_ENDPOINT,
+  bucket: process.env.S3_BUCKET || '(missing)',
+  endpoint: process.env.S3_ENDPOINT || '(missing)',
+  region: process.env.S3_REGION || '(missing)',
   accessKeyId: !!process.env.S3_ACCESS_KEY_ID,
   secretKey: !!process.env.S3_SECRET_ACCESS_KEY,
 })
+console.log('==============================')
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is missing. Check your Render environment variables.')
