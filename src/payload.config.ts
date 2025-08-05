@@ -26,10 +26,15 @@ export default buildConfig({
     user: Users.slug,
   },
   cors: [
-    'https://ecofocusresearch.netlify.app', // ✅ Netlify site
-    'http://localhost:3000', // ✅ Local dev
+    'https://ecofocusresearch.netlify.app',
+    'http://localhost:3000',
+    'https://ecofocus-cms.onrender.com',
   ],
-  csrf: ['https://ecofocusresearch.netlify.app', 'http://localhost:3000'],
+  csrf: [
+    'https://ecofocusresearch.netlify.app',
+    'http://localhost:3000',
+    'https://ecofocus-cms.onrender.com', 
+  ],
   collections: [
     Users,
     Media,
