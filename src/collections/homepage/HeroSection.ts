@@ -10,38 +10,13 @@ export const HeroSection: CollectionConfig = {
     useAsTitle: 'headline',
     group: 'Homepage',
   },
-  access: {
-    read: () => true, // Public read for homepage
-    create: ({ req }) => !!req.user,
-    update: ({ req }) => !!req.user,
-    delete: ({ req }) => !!req.user,
-  },
   fields: [
-    {
-      name: 'headline',
-      type: 'text',
-      required: true,
-    },
-    {
-      name: 'subheadline',
-      type: 'text',
-      required: false,
-    },
-    {
-      name: 'description',
-      type: 'textarea',
-      required: false,
-    },
-    {
-      name: 'backgroundImage',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'backgroundVideo',
-      type: 'upload',
-      relationTo: 'media',
-    },
+    { name: 'headline', type: 'text', required: true },
+    { name: 'highlightedWord', type: 'text', label: 'Highlighted Word', required: false },
+    { name: 'subheadline', type: 'text', required: true },
+    { name: 'description', type: 'textarea' },
+    { name: 'backgroundImage', type: 'upload', relationTo: 'media' },
+    { name: 'backgroundVideo', type: 'upload', relationTo: 'media' },
     {
       name: 'ctaButtons',
       type: 'array',
