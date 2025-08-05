@@ -2,6 +2,14 @@ import type { CollectionConfig } from 'payload'
 
 export const Media: CollectionConfig = {
   slug: 'media',
-  upload: true, // Enable upload (cloud storage will override local)
-  fields: [{ name: 'alt', type: 'text' }],
+  upload: {
+    mimeTypes: ['image/*', 'video/*'], // Optional filter for allowed uploads
+  },
+  fields: [
+    {
+      name: 'alt',
+      type: 'text',
+      required: true,
+    },
+  ],
 }
