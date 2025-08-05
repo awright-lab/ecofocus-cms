@@ -5,6 +5,7 @@ import sharp from 'sharp'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import cloudStorage from '@payloadcms/plugin-cloud-storage'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -33,7 +34,7 @@ export default buildConfig({
   csrf: [
     'https://ecofocusresearch.netlify.app',
     'http://localhost:3000',
-    'https://ecofocus-cms.onrender.com', 
+    'https://ecofocus-cms.onrender.com',
   ],
   collections: [
     Users,
@@ -61,5 +62,24 @@ export default buildConfig({
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
   sharp,
-  plugins: [payloadCloudPlugin()],
+  plugins: [
+    payloadCloudPlugin(),
+    cloudStorage({
+      collections: {
+        media: {
+          adapter: 's3', // ✅ Using S3 adapter for Backblaze B2
+          config: {
+            endpoint: process.env.S3_ENDPOINT || 'https://s3.us-west-002.backblazeb2.com', // Backblaze endpoint
+            credentials: {
+              accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+              secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+            },
+            region: process.env.S3_REGION || 'us-west-002',
+            bucket: process.env.S3_BUCKET || 'ecofocus-media',
+          },
+          baseUrl: process.env.CDN_BASE_URL || undefined, // ✅ Optional Cloudflare CDN URL
+        },
+      },
+    }),
+  ],
 })
