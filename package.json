@@ -9,7 +9,6 @@
     "prebuild": "npm run generate:importmap -- --force",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "devsafe": "Remove-Item -Recurse -Force .next; cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "serve": "cross-env NODE_OPTIONS=--no-deprecation payload serve",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
