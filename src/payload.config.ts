@@ -3,8 +3,8 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { s3Storage } from '@payloadcms/storage-s3'
 
 import { Users } from './collections/Users'
@@ -65,33 +65,20 @@ export default buildConfig({
   plugins: [
     payloadCloudPlugin(),
     s3Storage({
+      enabled: true,
       collections: {
-        media: {
-          // Optional: folder prefix
-          prefix: 'uploads/',
-          // Optional: signed URLs for MP4
-          signedDownloads: {
-            shouldUseSignedURL: ({ filename }) => filename.endsWith('.mp4'),
-          },
-          // Optional: CDN or custom URL
-          generateFileURL: ({ filename }) => {
-            if (process.env.CDN_BASE_URL) {
-              return `${process.env.CDN_BASE_URL}/${filename}`
-            }
-            // Default S3 URL fallback
-            return `https://${process.env.S3_BUCKET}.s3.${process.env.S3_REGION}.amazonaws.com/${filename}`
-          },
-        },
+        media: true, // Applies to Media collection
       },
       bucket: process.env.S3_BUCKET || 'ecofocus-media',
       config: {
-        endpoint: process.env.S3_ENDPOINT || 'https://s3.us-west-002.backblazeb2.com',
-        region: process.env.S3_REGION || 'us-west-002',
+        endpoint: process.env.S3_ENDPOINT || '',
         credentials: {
           accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
           secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
         },
+        region: process.env.S3_REGION || 'auto',
       },
+      // No custom URL for now — Cloudflare R2 public endpoint is fine
     }),
   ],
 })
