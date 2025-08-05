@@ -10,6 +10,12 @@ export const HeroSection: CollectionConfig = {
     useAsTitle: 'headline',
     group: 'Homepage',
   },
+  access: {
+    read: () => true,
+    create: ({ req: { user } }) => !!user,
+    update: ({ req: { user } }) => !!user,
+    delete: ({ req: { user } }) => !!user,
+  },
   fields: [
     { name: 'headline', type: 'text', required: true },
     { name: 'highlightedWord', type: 'text', label: 'Highlighted Word', required: false },
