@@ -5,7 +5,7 @@ import sharp from 'sharp'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
+import { s3Storage } from '@payloadcms/storage-s3'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -64,20 +64,32 @@ export default buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
-    cloudStorage({
+    s3Storage({
       collections: {
         media: {
-          adapter: 's3', // Use built-in S3 adapter for Backblaze B2
-          config: {
-            endpoint: process.env.S3_ENDPOINT || 'https://s3.us-west-002.backblazeb2.com',
-            credentials: {
-              accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-              secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-            },
-            region: process.env.S3_REGION || 'us-west-002',
-            bucket: process.env.S3_BUCKET || 'ecofocus-media',
+          // Optional: folder prefix
+          prefix: 'uploads/',
+          // Optional: signed URLs for MP4
+          signedDownloads: {
+            shouldUseSignedURL: ({ filename }) => filename.endsWith('.mp4'),
           },
-          baseUrl: process.env.CDN_BASE_URL || undefined, // Optional Cloudflare CDN URL
+          // Optional: CDN or custom URL
+          generateFileURL: ({ filename }) => {
+            if (process.env.CDN_BASE_URL) {
+              return `${process.env.CDN_BASE_URL}/${filename}`
+            }
+            // Default S3 URL fallback
+            return `https://${process.env.S3_BUCKET}.s3.${process.env.S3_REGION}.amazonaws.com/${filename}`
+          },
+        },
+      },
+      bucket: process.env.S3_BUCKET || 'ecofocus-media',
+      config: {
+        endpoint: process.env.S3_ENDPOINT || 'https://s3.us-west-002.backblazeb2.com',
+        region: process.env.S3_REGION || 'us-west-002',
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
         },
       },
     }),
