@@ -65,11 +65,10 @@ export default buildConfig({
   plugins: [
     payloadCloudPlugin(),
     s3Storage({
-      enabled: true,
       collections: {
-        media: true, // Applies to Media collection
+        media: true,
       },
-      bucket: process.env.S3_BUCKET || 'ecofocus-media',
+      bucket: process.env.S3_BUCKET || '',
       config: {
         endpoint: process.env.S3_ENDPOINT || '',
         credentials: {
@@ -78,7 +77,6 @@ export default buildConfig({
         },
         region: process.env.S3_REGION || 'auto',
       },
-      // No custom URL for now — Cloudflare R2 public endpoint is fine
     }),
   ],
 })
