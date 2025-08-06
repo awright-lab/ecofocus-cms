@@ -84,7 +84,11 @@ export default buildConfig({
     payloadCloudPlugin(),
     s3Storage({
       collections: {
-        media: true, // Enable R2 storage for Media collection
+        media: {
+          generateFileURL: ({ filename }) => {
+            return `https://pub-3816c55026314a19bf7805556b182cb0.r2.dev/${filename}` // Your public R2 bucket URL
+          },
+        },
       },
       bucket: process.env.S3_BUCKET || '',
       config: {
