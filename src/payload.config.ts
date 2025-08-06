@@ -54,6 +54,7 @@ export default buildConfig({
     'http://localhost:3000',
     'https://ecofocus-cms.onrender.com',
   ],
+  defaultDepth: 2,
   collections: [
     Users,
     Media,
