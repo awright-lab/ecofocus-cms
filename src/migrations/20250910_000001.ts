@@ -55,20 +55,47 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "media" ADD COLUMN IF NOT EXISTS "alt_text" varchar;
 
   -- Foreign keys
-  ALTER TABLE "authors" ADD CONSTRAINT "authors_headshot_id_media_id_fk"
-    FOREIGN KEY ("headshot_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'authors_headshot_id_media_id_fk') THEN
+      ALTER TABLE "authors" ADD CONSTRAINT "authors_headshot_id_media_id_fk"
+        FOREIGN KEY ("headshot_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+    END IF;
+  END $$;
 
-  ALTER TABLE "posts" ADD CONSTRAINT "posts_author_id_authors_id_fk"
-    FOREIGN KEY ("author_id") REFERENCES "public"."authors"("id") ON DELETE restrict ON UPDATE no action;
-  ALTER TABLE "posts" ADD CONSTRAINT "posts_hero_image_id_media_id_fk"
-    FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
-  ALTER TABLE "posts" ADD CONSTRAINT "posts_seo_og_image_id_media_id_fk"
-    FOREIGN KEY ("seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'posts_author_id_authors_id_fk') THEN
+      ALTER TABLE "posts" ADD CONSTRAINT "posts_author_id_authors_id_fk"
+        FOREIGN KEY ("author_id") REFERENCES "public"."authors"("id") ON DELETE restrict ON UPDATE no action;
+    END IF;
+  END $$;
 
-  ALTER TABLE "posts_topics" ADD CONSTRAINT "posts_topics_parent_fk"
-    FOREIGN KEY ("_parent_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "posts_topics" ADD CONSTRAINT "posts_topics_topic_fk"
-    FOREIGN KEY ("topic_id") REFERENCES "public"."topics"("id") ON DELETE cascade ON UPDATE no action;
+  DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'posts_hero_image_id_media_id_fk') THEN
+      ALTER TABLE "posts" ADD CONSTRAINT "posts_hero_image_id_media_id_fk"
+        FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+    END IF;
+  END $$;
+
+  DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'posts_seo_og_image_id_media_id_fk') THEN
+      ALTER TABLE "posts" ADD CONSTRAINT "posts_seo_og_image_id_media_id_fk"
+        FOREIGN KEY ("seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+    END IF;
+  END $$;
+
+  DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'posts_topics_parent_fk') THEN
+      ALTER TABLE "posts_topics" ADD CONSTRAINT "posts_topics_parent_fk"
+        FOREIGN KEY ("_parent_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
+    END IF;
+  END $$;
+
+  DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'posts_topics_topic_fk') THEN
+      ALTER TABLE "posts_topics" ADD CONSTRAINT "posts_topics_topic_fk"
+        FOREIGN KEY ("topic_id") REFERENCES "public"."topics"("id") ON DELETE cascade ON UPDATE no action;
+    END IF;
+  END $$;
 
   -- Indexes & constraints
   CREATE INDEX IF NOT EXISTS "authors_updated_at_idx" ON "authors" USING btree ("updated_at");

@@ -90,7 +90,7 @@ export default buildConfig({
     {
       path: '/preview-token',
       method: 'post',
-      handler: async (req, res) => {
+      handler: async (req, res, _next) => {
         try {
           const secret = process.env.PREVIEW_SECRET || process.env.PAYLOAD_SECRET || ''
           if (!secret) {
