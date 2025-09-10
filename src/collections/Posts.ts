@@ -43,7 +43,7 @@ const extractBlockText = (blocks: any[]): string => {
 export const Posts: CollectionConfig = {
   slug: 'posts',
   labels: { singular: 'Post', plural: 'Posts' },
-  admin: { useAsTitle: 'title' },
+  admin: { useAsTitle: 'title', group: 'Content', defaultColumns: ['title', 'status', 'publishedAt'] },
   access: {
     read: async ({ req }) => {
       // Public can read published posts; drafts allowed with preview token or auth
@@ -58,9 +58,9 @@ export const Posts: CollectionConfig = {
   },
   // Using explicit status field and preview-token access instead of versions/drafts
   fields: [
-    { name: 'title', type: 'text', required: true },
-    { name: 'slug', type: 'text', unique: true, index: true },
-    { name: 'dek', type: 'textarea' },
+    { name: 'title', type: 'text', required: true, admin: { description: 'Headline for the article.' } },
+    { name: 'slug', type: 'text', unique: true, index: true, admin: { description: 'URL-friendly identifier; auto-generated from the title.' } },
+    { name: 'dek', type: 'textarea', admin: { description: '1–2 sentence summary shown on lists and social.' } },
     {
       name: 'author',
       type: 'relationship',
@@ -72,11 +72,13 @@ export const Posts: CollectionConfig = {
       type: 'relationship',
       relationTo: 'topics' as unknown as any,
       hasMany: true,
+      admin: { description: 'Pick 1–3 topics to help readers find this post.' },
     },
     {
       name: 'publishedAt',
       type: 'date',
       defaultValue: () => new Date(),
+      admin: { description: 'Publication date; defaults to now.' },
     },
     {
       name: 'readTime',
@@ -87,19 +89,21 @@ export const Posts: CollectionConfig = {
       name: 'heroImage',
       type: 'relationship',
       relationTo: 'media',
+      admin: { description: 'Lead image for the article.' },
     },
     {
       name: 'body',
       type: 'blocks',
       blocks: [Paragraph, ImageBlock, PullQuote, KeyTakeaways, CTAGroup],
+      admin: { description: 'Write your article content with paragraphs, images, quotes, and calls to action.' },
     },
     {
       name: 'seo',
       type: 'group',
       fields: [
-        { name: 'metaTitle', type: 'text' },
-        { name: 'metaDescription', type: 'textarea' },
-        { name: 'ogImage', type: 'relationship', relationTo: 'media' },
+        { name: 'metaTitle', type: 'text', admin: { description: 'Custom title for search and social (optional).' } },
+        { name: 'metaDescription', type: 'textarea', admin: { description: 'Short description for search and social (optional).' } },
+        { name: 'ogImage', type: 'relationship', relationTo: 'media', admin: { description: 'Override social image (optional).' } },
       ],
     },
     {

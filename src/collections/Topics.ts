@@ -4,11 +4,11 @@ import { slugify } from '../utils/slugify'
 export const Topics: CollectionConfig = {
   slug: 'topics',
   labels: { singular: 'Topic', plural: 'Topics' },
-  admin: { useAsTitle: 'label' },
+  admin: { useAsTitle: 'label', group: 'Content' },
   access: { read: () => true },
   fields: [
-    { name: 'label', type: 'text', required: true, unique: true },
-    { name: 'slug', type: 'text', unique: true, index: true },
+    { name: 'label', type: 'text', required: true, unique: true, admin: { description: 'The tag shown to readers, e.g. “Sustainability”.' } },
+    { name: 'slug', type: 'text', unique: true, index: true, admin: { description: 'URL-friendly identifier; auto-generated from the label.' } },
   ],
   hooks: {
     beforeValidate: [({ data }) => {
@@ -18,4 +18,3 @@ export const Topics: CollectionConfig = {
     }],
   },
 }
-

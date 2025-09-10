@@ -4,24 +4,29 @@ import { slugify } from '../utils/slugify'
 export const Authors: CollectionConfig = {
   slug: 'authors',
   labels: { singular: 'Author', plural: 'Authors' },
-  admin: { useAsTitle: 'name' },
+  admin: { useAsTitle: 'name', group: 'Content' },
   access: {
     read: () => true,
+    create: ({ req }) => !req.user?.role || ['admin', 'editor'].includes(req.user.role),
+    update: ({ req }) => !req.user?.role || ['admin', 'editor'].includes(req.user.role),
+    delete: ({ req }) => req.user?.role === 'admin',
   },
   fields: [
-    { name: 'name', type: 'text', required: true },
-    { name: 'title', type: 'text' },
-    { name: 'bio', type: 'richText' },
+    { name: 'name', type: 'text', required: true, admin: { description: 'Full name, e.g. “Jane Doe”.' } },
+    { name: 'title', type: 'text', admin: { description: 'Author’s role or byline, e.g. “Senior Analyst”.' } },
+    { name: 'bio', type: 'richText', admin: { description: 'Short bio shown on author pages.' } },
     {
       name: 'headshot',
       type: 'relationship',
       relationTo: 'media',
+      admin: { description: 'Upload a square image if possible.' },
     },
     {
       name: 'slug',
       type: 'text',
       unique: true,
       index: true,
+      admin: { description: 'URL-friendly identifier; auto-generated from the name.' },
     },
   ],
   hooks: {
@@ -34,4 +39,3 @@ export const Authors: CollectionConfig = {
     }],
   },
 }
-
