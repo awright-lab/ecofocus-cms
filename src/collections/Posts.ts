@@ -64,13 +64,13 @@ export const Posts: CollectionConfig = {
     {
       name: 'author',
       type: 'relationship',
-      relationTo: 'authors',
+      relationTo: 'authors' as unknown as any,
       required: true,
     },
     {
       name: 'topics',
       type: 'relationship',
-      relationTo: 'topics',
+      relationTo: 'topics' as unknown as any,
       hasMany: true,
     },
     {

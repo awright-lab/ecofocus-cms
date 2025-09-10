@@ -98,7 +98,6 @@ export default buildConfig({
           }
           const exp = Date.now() + 5 * 60 * 1000 // 5 minutes
           const payload = { exp, sub: 'preview' }
-          const enc = new TextEncoder()
           const data = Buffer.from(JSON.stringify(payload)).toString('base64url')
           const crypto = await import('crypto')
           const signature = crypto
@@ -107,7 +106,7 @@ export default buildConfig({
             .digest('base64url')
           const token = `${data}.${signature}`
           return res.status(200).json({ token, exp })
-        } catch (e) {
+        } catch (_e) {
           return res.status(500).json({ error: 'Failed to create token' })
         }
       },
