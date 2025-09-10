@@ -4,8 +4,11 @@ import { createHmac } from 'crypto'
 export const verifyPreviewToken = (req?: PayloadRequest): boolean => {
   try {
     if (!req) return false
-    const draft = (req.query?.draft ?? req.body?.draft) as string | undefined
-    const token = (req.query?.previewToken ?? req.body?.previewToken) as string | undefined
+    const anyReq = req as any
+    const q = anyReq?.query as any
+    const b = anyReq?.body as any
+    const draft = (q?.draft ?? (typeof b === 'object' ? b?.draft : undefined)) as string | undefined
+    const token = (q?.previewToken ?? (typeof b === 'object' ? b?.previewToken : undefined)) as string | undefined
     if (!draft || String(draft) !== 'true' || !token) return false
     const secret = process.env.PREVIEW_SECRET || process.env.PAYLOAD_SECRET || ''
     if (!secret) return false
