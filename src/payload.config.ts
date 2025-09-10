@@ -49,7 +49,6 @@ export default buildConfig({
     user: Users.slug,
     meta: {
       titleSuffix: ' • EcoFocus CMS',
-      favicon: '/ecofocus-favicon.svg',
     },
     components: {
       graphics: {
