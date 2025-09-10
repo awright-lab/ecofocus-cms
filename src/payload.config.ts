@@ -53,7 +53,14 @@ export default buildConfig({
     favicon: '/ecofocus-favicon.svg',
     components: {
       graphics: {
-        Logo: EcoFocusLogo as unknown as any,
+        Logo: {
+          path: path.resolve(dirname, 'ui/admin/EcoFocusLogo.tsx'),
+        } as unknown as any,
+      },
+      views: {
+        Dashboard: {
+          path: path.resolve(dirname, 'ui/admin/WelcomeDashboard.tsx'),
+        } as unknown as any,
       },
     },
     css: path.resolve(dirname, 'ui/admin/custom.css'),

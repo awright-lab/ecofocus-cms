@@ -16,19 +16,21 @@ export default async function HomePage() {
   const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
 
   return (
-    <div className="home">
+    <div className="home" style={{
+      background: 'linear-gradient(135deg, #f3fbf7 0%, #e8f7f0 100%)',
+    }}>
       <div className="content">
-        <picture>
-          <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg" />
-          <Image
-            alt="Payload Logo"
-            height={65}
-            src="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg"
-            width={65}
-          />
-        </picture>
-        {!user && <h1>Welcome to your new project.</h1>}
-        {user && <h1>Welcome back, {user.email}</h1>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Image alt="EcoFocus Logo" src="/ecofocus-logo.svg" width={160} height={36} />
+        </div>
+        <p style={{ marginTop: 8, color: '#176342' }}>
+          Manage authors, topics, and posts for EcoFocus Research.
+        </p>
+        {user ? (
+          <p>Signed in as {user.email}</p>
+        ) : (
+          <p>You are not signed in.</p>
+        )}
         <div className="links">
           <a
             className="admin"
@@ -36,15 +38,15 @@ export default async function HomePage() {
             rel="noopener noreferrer"
             target="_blank"
           >
-            Go to admin panel
+            Open Admin
           </a>
           <a
             className="docs"
-            href="https://payloadcms.com/docs"
+            href="https://ecofocusresearch.netlify.app"
             rel="noopener noreferrer"
             target="_blank"
           >
-            Documentation
+            View Website
           </a>
         </div>
       </div>
