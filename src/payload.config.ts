@@ -21,7 +21,7 @@ import { WhyChoose } from './collections/homepage/WhyChoose'
 import { TrustedBy } from './collections/homepage/TrustedBy'
 import { CTABanner } from './collections/homepage/CTABanner'
 import { ApiKeys } from './collections/ApiKeys'
-import EcoFocusLogo from './ui/admin/EcoFocusLogo'
+// no direct import of admin components; referenced via import map paths
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -49,8 +49,8 @@ export default buildConfig({
     user: Users.slug,
     meta: {
       titleSuffix: ' • EcoFocus CMS',
+      favicon: '/ecofocus-favicon.svg',
     },
-    favicon: '/ecofocus-favicon.svg',
     components: {
       graphics: {
         Logo: {
