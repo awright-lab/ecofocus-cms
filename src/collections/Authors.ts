@@ -7,9 +7,9 @@ export const Authors: CollectionConfig = {
   admin: { useAsTitle: 'name', group: 'Content' },
   access: {
     read: () => true,
-    create: ({ req }) => !req.user?.role || ['admin', 'editor'].includes(req.user.role),
-    update: ({ req }) => !req.user?.role || ['admin', 'editor'].includes(req.user.role),
-    delete: ({ req }) => req.user?.role === 'admin',
+    create: ({ req }) => ['admin', 'editor'].includes(((req.user as any)?.role)),
+    update: ({ req }) => ['admin', 'editor'].includes(((req.user as any)?.role)),
+    delete: ({ req }) => ((req.user as any)?.role) === 'admin',
   },
   fields: [
     { name: 'name', type: 'text', required: true, admin: { description: 'Full name, e.g. “Jane Doe”.' } },
