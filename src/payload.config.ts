@@ -21,6 +21,7 @@ import { WhyChoose } from './collections/homepage/WhyChoose'
 import { TrustedBy } from './collections/homepage/TrustedBy'
 import { CTABanner } from './collections/homepage/CTABanner'
 import { ApiKeys } from './collections/ApiKeys'
+import EcoFocusLogo from './ui/admin/EcoFocusLogo'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -46,6 +47,16 @@ if (!process.env.DATABASE_URL) {
 export default buildConfig({
   admin: {
     user: Users.slug,
+    meta: {
+      titleSuffix: ' • EcoFocus CMS',
+    },
+    favicon: '/ecofocus-favicon.svg',
+    components: {
+      graphics: {
+        Logo: EcoFocusLogo as unknown as any,
+      },
+    },
+    css: path.resolve(dirname, 'ui/admin/custom.css'),
   },
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
   cors: [

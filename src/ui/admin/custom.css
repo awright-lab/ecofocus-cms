@@ -1,0 +1,37 @@
+:root {
+  /* Brand greens */
+  --brand-green-500: #22A06B;
+  --brand-green-600: #1B865A;
+  --brand-green-700: #176342;
+
+  /* Use brand as accent */
+  --theme-accent-500: var(--brand-green-500);
+  --theme-accent-600: var(--brand-green-600);
+  --theme-accent-700: var(--brand-green-700);
+
+  /* Buttons & links tint */
+  --btn-primary-color: var(--brand-green-500);
+}
+
+/* Login and header tweaks */
+.payload-header .logo, .app-header .logo {
+  color: var(--theme-elevation-1000);
+}
+
+/* Primary buttons */
+button[class*='btn--primary'],
+.btn--primary {
+  background: var(--brand-green-600) !important;
+}
+.btn--primary:hover {
+  background: var(--brand-green-700) !important;
+}
+
+/* Link color accents */
+a {
+  color: var(--brand-green-600);
+}
+a:hover {
+  color: var(--brand-green-700);
+}
+
