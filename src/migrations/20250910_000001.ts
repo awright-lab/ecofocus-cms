@@ -52,30 +52,22 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   );
 
   -- Add alt_text to media for aliasing
-  DO $$
-  BEGIN
-    BEGIN
-      ALTER TABLE "media" ADD COLUMN "alt_text" varchar;
-    EXCEPTION WHEN duplicate_column THEN
-      -- ignore if it already exists
-      NULL;
-    END;
-  END $$;
+  ALTER TABLE "media" ADD COLUMN IF NOT EXISTS "alt_text" varchar;
 
   -- Foreign keys
-  ALTER TABLE "authors" ADD CONSTRAINT IF NOT EXISTS "authors_headshot_id_media_id_fk"
+  ALTER TABLE "authors" ADD CONSTRAINT "authors_headshot_id_media_id_fk"
     FOREIGN KEY ("headshot_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
 
-  ALTER TABLE "posts" ADD CONSTRAINT IF NOT EXISTS "posts_author_id_authors_id_fk"
+  ALTER TABLE "posts" ADD CONSTRAINT "posts_author_id_authors_id_fk"
     FOREIGN KEY ("author_id") REFERENCES "public"."authors"("id") ON DELETE restrict ON UPDATE no action;
-  ALTER TABLE "posts" ADD CONSTRAINT IF NOT EXISTS "posts_hero_image_id_media_id_fk"
+  ALTER TABLE "posts" ADD CONSTRAINT "posts_hero_image_id_media_id_fk"
     FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
-  ALTER TABLE "posts" ADD CONSTRAINT IF NOT EXISTS "posts_seo_og_image_id_media_id_fk"
+  ALTER TABLE "posts" ADD CONSTRAINT "posts_seo_og_image_id_media_id_fk"
     FOREIGN KEY ("seo_og_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
 
-  ALTER TABLE "posts_topics" ADD CONSTRAINT IF NOT EXISTS "posts_topics_parent_fk"
+  ALTER TABLE "posts_topics" ADD CONSTRAINT "posts_topics_parent_fk"
     FOREIGN KEY ("_parent_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "posts_topics" ADD CONSTRAINT IF NOT EXISTS "posts_topics_topic_fk"
+  ALTER TABLE "posts_topics" ADD CONSTRAINT "posts_topics_topic_fk"
     FOREIGN KEY ("topic_id") REFERENCES "public"."topics"("id") ON DELETE cascade ON UPDATE no action;
 
   -- Indexes & constraints
@@ -118,4 +110,3 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   ALTER TABLE IF EXISTS "media" DROP COLUMN IF EXISTS "alt_text";
   `)
 }
-
