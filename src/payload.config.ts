@@ -86,11 +86,11 @@ export default buildConfig({
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
   sharp,
-  endpoints: [
+  endpoints: ([
     {
       path: '/preview-token',
       method: 'post',
-      handler: async (req, res, _next) => {
+      handler: (async (req, res, _next, _ctx) => {
         try {
           const secret = process.env.PREVIEW_SECRET || process.env.PAYLOAD_SECRET || ''
           if (!secret) {
@@ -109,9 +109,9 @@ export default buildConfig({
         } catch (_e) {
           return res.status(500).json({ error: 'Failed to create token' })
         }
-      },
+      }) as unknown as any,
     },
-  ],
+  ] as unknown as any),
   plugins: [
     payloadCloudPlugin(),
     s3Storage({
