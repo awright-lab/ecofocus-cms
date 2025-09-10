@@ -1,0 +1,21 @@
+/* Custom Admin styling for EcoFocus */
+:root {
+  --brand-green-500: #22A06B;
+  --brand-green-600: #1B865A;
+  --brand-green-700: #176342;
+
+  --theme-accent-500: var(--brand-green-500);
+  --theme-accent-600: var(--brand-green-600);
+  --theme-accent-700: var(--brand-green-700);
+}
+
+.btn--primary,
+button[class*='btn--primary'] {
+  background: var(--brand-green-600);
+}
+.btn--primary:hover {
+  background: var(--brand-green-700);
+}
+
+a { color: var(--brand-green-600); }
+a:hover { color: var(--brand-green-700); }

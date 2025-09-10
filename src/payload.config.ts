@@ -62,7 +62,6 @@ export default buildConfig({
         } as unknown as any,
       },
     },
-    css: path.resolve(dirname, 'ui/admin/custom.css'),
   },
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
   cors: [
