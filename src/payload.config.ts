@@ -54,12 +54,12 @@ export default buildConfig({
     components: {
       graphics: {
         Logo: {
-          path: path.resolve(dirname, 'ui/admin/EcoFocusLogo.tsx'),
+          path: '@/ui/admin/EcoFocusLogo',
         } as unknown as any,
       },
       views: {
         Dashboard: {
-          path: path.resolve(dirname, 'ui/admin/WelcomeDashboard.tsx'),
+          path: '@/ui/admin/WelcomeDashboard',
         } as unknown as any,
       },
     },
