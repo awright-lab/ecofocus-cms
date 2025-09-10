@@ -9,6 +9,9 @@ import { s3Storage } from '@payloadcms/storage-s3'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Authors } from './collections/Authors'
+import { Topics } from './collections/Topics'
+import { Posts } from './collections/Posts'
 import { HeroSection } from './collections/homepage/HeroSection'
 import { QuickStats } from './collections/homepage/QuickStats'
 import { FeaturedReport } from './collections/homepage/FeaturedReport'
@@ -44,20 +47,22 @@ export default buildConfig({
   admin: {
     user: Users.slug,
   },
+  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
   cors: [
     'https://ecofocusresearch.netlify.app',
     'http://localhost:3000',
-    'https://ecofocus-cms.onrender.com',
   ],
   csrf: [
     'https://ecofocusresearch.netlify.app',
     'http://localhost:3000',
-    'https://ecofocus-cms.onrender.com',
   ],
   defaultDepth: 2,
   collections: [
     Users,
     Media,
+    Authors,
+    Topics,
+    Posts,
     HeroSection,
     QuickStats,
     FeaturedReport,
@@ -81,13 +86,45 @@ export default buildConfig({
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
   sharp,
+  endpoints: [
+    {
+      path: '/preview-token',
+      method: 'post',
+      handler: async (req, res) => {
+        try {
+          const secret = process.env.PREVIEW_SECRET || process.env.PAYLOAD_SECRET || ''
+          if (!secret) {
+            return res.status(500).json({ error: 'Missing PREVIEW_SECRET' })
+          }
+          const exp = Date.now() + 5 * 60 * 1000 // 5 minutes
+          const payload = { exp, sub: 'preview' }
+          const enc = new TextEncoder()
+          const data = Buffer.from(JSON.stringify(payload)).toString('base64url')
+          const crypto = await import('crypto')
+          const signature = crypto
+            .createHmac('sha256', secret)
+            .update(data)
+            .digest('base64url')
+          const token = `${data}.${signature}`
+          return res.status(200).json({ token, exp })
+        } catch (e) {
+          return res.status(500).json({ error: 'Failed to create token' })
+        }
+      },
+    },
+  ],
   plugins: [
     payloadCloudPlugin(),
     s3Storage({
       collections: {
         media: {
+          disableLocalStorage: true,
           generateFileURL: ({ filename }) => {
-            return `https://pub-3816c55026314a19bf7805556b182cb0.r2.dev/${filename}` // Your public R2 bucket URL
+            const base = process.env.S3_PUBLIC_BASE_URL
+            if (base) return `${base.replace(/\/+$/, '')}/${filename}`
+            const endpoint = (process.env.S3_ENDPOINT || '').replace(/^https?:\/\//, '').replace(/\/+$/, '')
+            const bucket = (process.env.S3_BUCKET || '').replace(/\/+$/, '')
+            return `https://${endpoint}/${bucket}/${filename}`
           },
         },
       },

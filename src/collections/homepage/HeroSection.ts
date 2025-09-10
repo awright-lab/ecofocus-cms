@@ -17,7 +17,7 @@ export const HeroSection: CollectionConfig = {
     delete: ({ req: { user } }) => !!user,
   },
   fields: [
-    { name: 'headline', type: 'text', required: true },
+    { name: 'headline', type: 'richText', required: true },
     { name: 'highlightedWord', type: 'text', label: 'Highlighted Word', required: false },
     { name: 'subheadline', type: 'text', required: true },
     { name: 'description', type: 'textarea' },
