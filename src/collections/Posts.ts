@@ -130,23 +130,39 @@ export const Posts: CollectionConfig = {
       data.readTime = Math.max(1, Math.ceil(words / 200))
       return data
     }],
-    afterChange: [async ({ doc }) => {
+    afterChange: [async ({ doc, req }) => {
       try {
         if (doc?.status === 'published') {
           const url = process.env.FRONTEND_REVALIDATE_URL
           const secret = process.env.REVALIDATE_SECRET
-          if (url && secret) {
-            await fetch(url, {
+          if (url && secret && doc.slug) {
+            const u = new URL(url)
+            // also pass secret in query for handlers that expect it
+            if (!u.searchParams.get('secret')) u.searchParams.set('secret', secret)
+            const payload = {
+              slug: doc.slug,
+              type: 'post',
+              path: `/posts/${doc.slug}`,
+              secret,
+            }
+            const res = await fetch(u.toString(), {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'x-secret': secret,
               },
-              body: JSON.stringify({ slug: doc.slug }),
-            }).catch(() => {})
+              body: JSON.stringify(payload),
+            }).catch(() => undefined)
+            if (!res || !res.ok) {
+              console.warn('Revalidate webhook failed', { status: res?.status, url: u.toString() })
+            }
+          } else {
+            console.warn('Missing FRONTEND_REVALIDATE_URL or REVALIDATE_SECRET; skip revalidate')
           }
         }
-      } catch {}
+      } catch (e) {
+        console.warn('Error in posts.afterChange revalidate', e)
+      }
     }],
   },
 }
