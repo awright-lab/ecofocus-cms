@@ -3,7 +3,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { lexicalEditor, LinkFeature } from '@payloadcms/richtext-lexical'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { s3Storage } from '@payloadcms/storage-s3'
 
@@ -89,7 +89,15 @@ export default buildConfig({
     CTABanner,
     ApiKeys,
   ],
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      LinkFeature({
+        // Allow linking to external URLs and internal documents
+        enabledCollections: ['posts', 'topics', 'authors', 'media'],
+      }),
+    ],
+  }),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
