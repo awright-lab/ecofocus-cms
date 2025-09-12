@@ -135,11 +135,11 @@ export default buildConfig({
         media: {
           disableLocalStorage: true,
           generateFileURL: ({ filename }) => {
-            const base = process.env.S3_PUBLIC_BASE_URL
-            if (base) return `${base.replace(/\/+$/, '')}/${filename}`
-            const endpoint = (process.env.S3_ENDPOINT || '').replace(/^https?:\/\//, '').replace(/\/+$/, '')
-            const bucket = (process.env.S3_BUCKET || '').replace(/\/+$/, '')
-            return `https://${endpoint}/${bucket}/${filename}`
+            const base =
+              process.env.S3_PUBLIC_BASE_URL ||
+              process.env.PAYLOAD_PUBLIC_ASSET_BASE_URL ||
+              'https://pub-3816c55026314a19bf7805556b182cb0.r2.dev'
+            return `${String(base).replace(/\/+$/, '')}/${filename}`
           },
         },
       },
