@@ -94,7 +94,6 @@ export default buildConfig({
       ...defaultFeatures,
       LinkFeature({
         // Allow linking to external URLs and internal documents
-        // @ts-expect-error: assert literals to Payload's CollectionSlug[] until generated types align
         enabledCollections: ['posts', 'topics', 'authors', 'media'] as unknown as import('payload').CollectionSlug[],
       }),
     ],
