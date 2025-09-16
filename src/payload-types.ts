@@ -69,6 +69,19 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    authors: Author;
+    topics: Topic;
+    datasets: Dataset;
+    posts: Post;
+    'hero-section': HeroSection;
+    'quick-stats': QuickStat;
+    'featured-report': FeaturedReport;
+    'dashboard-promo': DashboardPromo;
+    'eco-nuggets': EcoNugget;
+    'why-choose': WhyChoose;
+    'trusted-by': TrustedBy;
+    'cta-banner': CtaBanner;
+    'api-keys': ApiKey;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -77,12 +90,25 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    authors: AuthorsSelect<false> | AuthorsSelect<true>;
+    topics: TopicsSelect<false> | TopicsSelect<true>;
+    datasets: DatasetsSelect<false> | DatasetsSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    'hero-section': HeroSectionSelect<false> | HeroSectionSelect<true>;
+    'quick-stats': QuickStatsSelect<false> | QuickStatsSelect<true>;
+    'featured-report': FeaturedReportSelect<false> | FeaturedReportSelect<true>;
+    'dashboard-promo': DashboardPromoSelect<false> | DashboardPromoSelect<true>;
+    'eco-nuggets': EcoNuggetsSelect<false> | EcoNuggetsSelect<true>;
+    'why-choose': WhyChooseSelect<false> | WhyChooseSelect<true>;
+    'trusted-by': TrustedBySelect<false> | TrustedBySelect<true>;
+    'cta-banner': CtaBannerSelect<false> | CtaBannerSelect<true>;
+    'api-keys': ApiKeysSelect<false> | ApiKeysSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   globals: {};
   globalsSelect: {};
@@ -118,7 +144,11 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
+  /**
+   * Admins can manage all settings and users. Editors manage content and media only.
+   */
+  role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -142,8 +172,12 @@ export interface User {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
+  /**
+   * Alias of alt for frontend compatibility
+   */
+  altText?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -158,23 +192,499 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors".
+ */
+export interface Author {
+  id: number;
+  /**
+   * Full name, e.g. “Jane Doe”.
+   */
+  name: string;
+  /**
+   * Author’s role or byline, e.g. “Senior Analyst”.
+   */
+  title?: string | null;
+  /**
+   * Short bio shown on author pages.
+   */
+  bio?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Upload a square image if possible.
+   */
+  headshot?: (number | null) | Media;
+  /**
+   * URL-friendly identifier; auto-generated from the name.
+   */
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "topics".
+ */
+export interface Topic {
+  id: number;
+  /**
+   * The tag shown to readers, e.g. “Sustainability”.
+   */
+  label: string;
+  /**
+   * URL-friendly identifier; auto-generated from the label.
+   */
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "datasets".
+ */
+export interface Dataset {
+  id: number;
+  title: string;
+  /**
+   * Auto-generated from title if left blank.
+   */
+  slug?: string | null;
+  /**
+   * Where this data came from (optional).
+   */
+  sourceUrl?: string | null;
+  /**
+   * Array of row objects. Example: [{"month":"2024-01","value":123}, ...]
+   */
+  data:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  /**
+   * Headline for the article.
+   */
+  title: string;
+  /**
+   * URL-friendly identifier; auto-generated from the title.
+   */
+  slug?: string | null;
+  /**
+   * 1–2 sentence summary shown on lists and social.
+   */
+  dek?: string | null;
+  author: number | Author;
+  /**
+   * Pick 1–3 topics to help readers find this post.
+   */
+  topics?: (number | Topic)[] | null;
+  /**
+   * Publication date; defaults to now.
+   */
+  publishedAt?: string | null;
+  readTime?: number | null;
+  /**
+   * Lead image for the article.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Write your article content with paragraphs, images, quotes, charts, and calls to action.
+   */
+  body?:
+    | (
+        | {
+            /**
+             * Rich text paragraph (supports bold, italic, links, etc.)
+             */
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: string;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'paragraph';
+          }
+        | ImageBlock
+        | PullQuoteBlock
+        | KeyTakeawaysBlock
+        | CTAGroupBlock
+        | {
+            chartType: 'bar' | 'line' | 'area' | 'pie' | 'donut' | 'scatter';
+            xField: string;
+            /**
+             * Optional. If provided, rows are pivoted by this field (series per unique value).
+             */
+            seriesLabelField?: string | null;
+            /**
+             * One or more numeric fields to plot.
+             */
+            yFields: {
+              field: string;
+              id?: string | null;
+            }[];
+            dataSource?: {
+              /**
+               * Reference a reusable dataset (preferred).
+               */
+              dataset?: (number | null) | Dataset;
+              /**
+               * Optional raw rows (array of objects). Used if no dataset is chosen.
+               */
+              inlineData?:
+                | {
+                    [k: string]: unknown;
+                  }
+                | unknown[]
+                | string
+                | number
+                | boolean
+                | null;
+            };
+            stacked?: boolean | null;
+            legend?: boolean | null;
+            unit?: string | null;
+            height?: number | null;
+            xLabel?: string | null;
+            yLabel?: string | null;
+            /**
+             * Optional color hex values in series order.
+             */
+            colorPalette?:
+              | {
+                  color: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'chartJS';
+          }
+      )[]
+    | null;
+  seo?: {
+    /**
+     * Custom title for search and social (optional).
+     */
+    metaTitle?: string | null;
+    /**
+     * Short description for search and social (optional).
+     */
+    metaDescription?: string | null;
+    /**
+     * Override social image (optional).
+     */
+    ogImage?: (number | null) | Media;
+  };
+  status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageBlock".
+ */
+export interface ImageBlock {
+  image: number | Media;
+  caption?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'imageBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PullQuoteBlock".
+ */
+export interface PullQuoteBlock {
+  quote: string;
+  attribution?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pullQuote';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "KeyTakeawaysBlock".
+ */
+export interface KeyTakeawaysBlock {
+  items: {
+    text: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'keyTakeaways';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CTAGroupBlock".
+ */
+export interface CTAGroupBlock {
+  ctas?:
+    | {
+        label: string;
+        href: string;
+        style?: ('primary' | 'secondary') | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ctaGroup';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-section".
+ */
+export interface HeroSection {
+  id: number;
+  headline: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  highlightedWord?: string | null;
+  subheadline: string;
+  description?: string | null;
+  backgroundImage?: (number | null) | Media;
+  backgroundVideo?: (number | null) | Media;
+  ctaButtons?:
+    | {
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quick-stats".
+ */
+export interface QuickStat {
+  id: number;
+  stats?:
+    | {
+        value: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "featured-report".
+ */
+export interface FeaturedReport {
+  id: number;
+  title: string;
+  description?: string | null;
+  price?: string | null;
+  ctaLabel?: string | null;
+  ctaUrl?: string | null;
+  image?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dashboard-promo".
+ */
+export interface DashboardPromo {
+  id: number;
+  headline?: string | null;
+  description?: string | null;
+  ctaLabel?: string | null;
+  ctaUrl?: string | null;
+  image?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eco-nuggets".
+ */
+export interface EcoNugget {
+  id: number;
+  heading?: string | null;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "why-choose".
+ */
+export interface WhyChoose {
+  id: number;
+  items?:
+    | {
+        title?: string | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "trusted-by".
+ */
+export interface TrustedBy {
+  id: number;
+  logos?:
+    | {
+        logo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cta-banner".
+ */
+export interface CtaBanner {
+  id: number;
+  text?: string | null;
+  buttonLabel?: string | null;
+  buttonUrl?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "api-keys".
+ */
+export interface ApiKey {
+  id: number;
+  label: string;
+  key?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'authors';
+        value: number | Author;
+      } | null)
+    | ({
+        relationTo: 'topics';
+        value: number | Topic;
+      } | null)
+    | ({
+        relationTo: 'datasets';
+        value: number | Dataset;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'hero-section';
+        value: number | HeroSection;
+      } | null)
+    | ({
+        relationTo: 'quick-stats';
+        value: number | QuickStat;
+      } | null)
+    | ({
+        relationTo: 'featured-report';
+        value: number | FeaturedReport;
+      } | null)
+    | ({
+        relationTo: 'dashboard-promo';
+        value: number | DashboardPromo;
+      } | null)
+    | ({
+        relationTo: 'eco-nuggets';
+        value: number | EcoNugget;
+      } | null)
+    | ({
+        relationTo: 'why-choose';
+        value: number | WhyChoose;
+      } | null)
+    | ({
+        relationTo: 'trusted-by';
+        value: number | TrustedBy;
+      } | null)
+    | ({
+        relationTo: 'cta-banner';
+        value: number | CtaBanner;
+      } | null)
+    | ({
+        relationTo: 'api-keys';
+        value: number | ApiKey;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -184,10 +694,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -207,7 +717,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -218,6 +728,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -241,6 +752,7 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  altText?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -252,6 +764,287 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors_select".
+ */
+export interface AuthorsSelect<T extends boolean = true> {
+  name?: T;
+  title?: T;
+  bio?: T;
+  headshot?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "topics_select".
+ */
+export interface TopicsSelect<T extends boolean = true> {
+  label?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "datasets_select".
+ */
+export interface DatasetsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  sourceUrl?: T;
+  data?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  dek?: T;
+  author?: T;
+  topics?: T;
+  publishedAt?: T;
+  readTime?: T;
+  heroImage?: T;
+  body?:
+    | T
+    | {
+        paragraph?:
+          | T
+          | {
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        imageBlock?: T | ImageBlockSelect<T>;
+        pullQuote?: T | PullQuoteBlockSelect<T>;
+        keyTakeaways?: T | KeyTakeawaysBlockSelect<T>;
+        ctaGroup?: T | CTAGroupBlockSelect<T>;
+        chartJS?:
+          | T
+          | {
+              chartType?: T;
+              xField?: T;
+              seriesLabelField?: T;
+              yFields?:
+                | T
+                | {
+                    field?: T;
+                    id?: T;
+                  };
+              dataSource?:
+                | T
+                | {
+                    dataset?: T;
+                    inlineData?: T;
+                  };
+              stacked?: T;
+              legend?: T;
+              unit?: T;
+              height?: T;
+              xLabel?: T;
+              yLabel?: T;
+              colorPalette?:
+                | T
+                | {
+                    color?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageBlock_select".
+ */
+export interface ImageBlockSelect<T extends boolean = true> {
+  image?: T;
+  caption?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PullQuoteBlock_select".
+ */
+export interface PullQuoteBlockSelect<T extends boolean = true> {
+  quote?: T;
+  attribution?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "KeyTakeawaysBlock_select".
+ */
+export interface KeyTakeawaysBlockSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CTAGroupBlock_select".
+ */
+export interface CTAGroupBlockSelect<T extends boolean = true> {
+  ctas?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        style?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-section_select".
+ */
+export interface HeroSectionSelect<T extends boolean = true> {
+  headline?: T;
+  highlightedWord?: T;
+  subheadline?: T;
+  description?: T;
+  backgroundImage?: T;
+  backgroundVideo?: T;
+  ctaButtons?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quick-stats_select".
+ */
+export interface QuickStatsSelect<T extends boolean = true> {
+  stats?:
+    | T
+    | {
+        value?: T;
+        description?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "featured-report_select".
+ */
+export interface FeaturedReportSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  price?: T;
+  ctaLabel?: T;
+  ctaUrl?: T;
+  image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dashboard-promo_select".
+ */
+export interface DashboardPromoSelect<T extends boolean = true> {
+  headline?: T;
+  description?: T;
+  ctaLabel?: T;
+  ctaUrl?: T;
+  image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eco-nuggets_select".
+ */
+export interface EcoNuggetsSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "why-choose_select".
+ */
+export interface WhyChooseSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "trusted-by_select".
+ */
+export interface TrustedBySelect<T extends boolean = true> {
+  logos?:
+    | T
+    | {
+        logo?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cta-banner_select".
+ */
+export interface CtaBannerSelect<T extends boolean = true> {
+  text?: T;
+  buttonLabel?: T;
+  buttonUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "api-keys_select".
+ */
+export interface ApiKeysSelect<T extends boolean = true> {
+  label?: T;
+  key?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
