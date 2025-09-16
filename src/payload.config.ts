@@ -77,7 +77,7 @@ export default buildConfig({
 
     // Keep only the custom Logo override. This type expects a module path string here.
     components: {
-      graphics: { Logo: { path: './ui/admin/EcoFocusLogo' } },
+      graphics: { Logo: { path: './ui/admin/EcoFocusLogo.tsx' } },
       // NOTE: remove Dashboard override for now to satisfy AdminViewConfig types
       // views: { Dashboard: { path: './ui/admin/WelcomeDashboard' } },
     },
