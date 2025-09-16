@@ -21,6 +21,7 @@ import { WhyChoose } from './collections/homepage/WhyChoose'
 import { TrustedBy } from './collections/homepage/TrustedBy'
 import { CTABanner } from './collections/homepage/CTABanner'
 import { ApiKeys } from './collections/ApiKeys'
+import { Datasets } from './collections/Datasets'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -74,17 +75,9 @@ export default buildConfig({
   admin: {
     user: Users.slug,
     meta: { titleSuffix: ' • EcoFocus CMS' },
-
-    // Keep only the custom Logo override. This type expects a module path string here.
     components: {
       graphics: { Logo: { path: 'src/ui/admin/EcoFocusLogo.tsx' } },
-      // NOTE: remove Dashboard override for now to satisfy AdminViewConfig types
-      // views: { Dashboard: { path: './ui/admin/WelcomeDashboard' } },
     },
-
-    // NOTE: remove admin.routes — your installed types expect a named routes object,
-    // and 'path' must be a URL ('/...'), not a module path.
-    // routes: [ ... ]  <-- removed intentionally
   },
 
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
@@ -94,10 +87,11 @@ export default buildConfig({
 
   collections: [
     Users,
-    Media, // slug: 'media'
-    Authors, // slug: 'authors'
-    Topics, // slug: 'topics'
-    Posts, // slug: 'posts'
+    Media, // 'media'
+    Authors, // 'authors'
+    Topics, // 'topics'
+    Datasets, // 'datasets'  <-- for ChartJS data references
+    Posts, // 'posts'
     HeroSection,
     QuickStats,
     FeaturedReport,
@@ -113,15 +107,19 @@ export default buildConfig({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
       LinkFeature({
-        // Internal linking targets — typed by CollectionSlug
-        enabledCollections: ['posts', 'topics', 'authors', 'media'] as CollectionSlug[],
+        enabledCollections: [
+          'posts',
+          'topics',
+          'authors',
+          'media',
+          'datasets', // allow internal links to datasets if useful
+        ] as CollectionSlug[],
       }),
     ],
   }),
 
   secret: process.env.PAYLOAD_SECRET || '',
 
-  // Generate TS types for stricter typing across the app
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
@@ -140,7 +138,6 @@ export default buildConfig({
     {
       path: '/preview-token',
       method: 'post',
-      // Cast here so the handler matches whichever PayloadHandler tuple your version expects
       handler: previewTokenHandler as unknown as import('payload').PayloadHandler,
     },
   ],

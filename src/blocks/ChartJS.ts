@@ -1,31 +1,121 @@
+// src/blocks/ChartJS.ts
 import type { Block } from 'payload'
 
 export const ChartJS: Block = {
   slug: 'chartJS',
-  labels: { singular: 'Chart (Chart.js)', plural: 'Charts (Chart.js)' },
+  labels: { singular: 'Chart', plural: 'Charts' },
   fields: [
     {
       name: 'chartType',
       type: 'select',
       required: true,
       defaultValue: 'bar',
-      options: ['bar', 'line', 'pie', 'doughnut', 'radar', 'polarArea', 'scatter', 'bubble'],
-      admin: { description: 'Chart.js type' },
+      options: [
+        { label: 'Bar', value: 'bar' },
+        { label: 'Line', value: 'line' },
+        { label: 'Area', value: 'area' },
+        { label: 'Pie', value: 'pie' },
+        { label: 'Donut', value: 'donut' },
+        { label: 'Scatter', value: 'scatter' },
+      ],
     },
     {
-      name: 'data',
-      type: 'json',
+      type: 'row',
+      fields: [
+        {
+          name: 'xField',
+          type: 'text',
+          required: true,
+          admin: { width: '50%' },
+        },
+        {
+          name: 'seriesLabelField',
+          type: 'text',
+          required: false,
+          admin: {
+            description:
+              'Optional. If provided, rows are pivoted by this field (series per unique value).',
+            width: '50%',
+          },
+        },
+      ],
+    },
+    {
+      name: 'yFields',
+      type: 'array',
       required: true,
-      admin: {
-        description: 'Paste a Chart.js “data” object: { labels: [...], datasets: [...] }',
+      minRows: 1,
+      admin: { description: 'One or more numeric fields to plot.' },
+      fields: [{ name: 'field', type: 'text', required: true }],
+      validate: (val) => (Array.isArray(val) && val.length > 0 ? true : 'Add at least one yField'),
+    },
+
+    // Data source: either pick a dataset doc or paste inline rows
+    {
+      name: 'dataSource',
+      type: 'group',
+      fields: [
+        {
+          name: 'dataset',
+          type: 'relationship',
+          relationTo: 'datasets' as unknown as import('payload').CollectionSlug, // temporary cast if your generated types don’t include 'datasets' yet
+          required: false,
+          admin: { description: 'Reference a reusable dataset (preferred).' },
+        },
+        {
+          name: 'inlineData',
+          type: 'json',
+          required: false,
+          admin: {
+            description: 'Optional raw rows (array of objects). Used if no dataset is chosen.',
+          },
+          validate: (val) => {
+            if (val == null) return true
+            return Array.isArray(val) ? true : 'inlineData must be an array of row objects'
+          },
+        },
+      ],
+      // ✅ Correct validate signature for Group field
+      validate: (value) => {
+        const v = (typeof value === 'object' && value !== null ? value : {}) as {
+          dataset?: unknown
+          inlineData?: unknown
+        }
+        const hasDataset = v.dataset != null && v.dataset !== ''
+        const hasInline = Array.isArray(v.inlineData) && v.inlineData.length > 0
+        return hasDataset || hasInline ? true : 'Select a dataset or provide inlineData.'
       },
     },
+
+    // Presentation
     {
-      name: 'options',
-      type: 'json',
-      admin: { description: 'Optional Chart.js “options” object.' },
+      type: 'row',
+      fields: [
+        { name: 'stacked', type: 'checkbox', defaultValue: false, admin: { width: '25%' } },
+        { name: 'legend', type: 'checkbox', defaultValue: true, admin: { width: '25%' } },
+        { name: 'unit', type: 'text', required: false, admin: { width: '25%' } },
+        {
+          name: 'height',
+          type: 'number',
+          defaultValue: 320,
+          min: 160,
+          admin: { width: '25%' },
+        },
+      ],
     },
-    { name: 'height', type: 'number', defaultValue: 360 },
-    { name: 'caption', type: 'text' },
+    {
+      type: 'row',
+      fields: [
+        { name: 'xLabel', type: 'text', required: false, admin: { width: '50%' } },
+        { name: 'yLabel', type: 'text', required: false, admin: { width: '50%' } },
+      ],
+    },
+    {
+      name: 'colorPalette',
+      type: 'array',
+      required: false,
+      admin: { description: 'Optional color hex values in series order.' },
+      fields: [{ name: 'color', type: 'text', required: true }],
+    },
   ],
 }
