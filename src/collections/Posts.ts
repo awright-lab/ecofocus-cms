@@ -1,48 +1,135 @@
-import type { CollectionConfig, PayloadRequest } from 'payload'
+import type { Access, CollectionConfig, PayloadRequest } from 'payload'
+
 import { Paragraph } from '../blocks/Paragraph'
 import { ImageBlock } from '../blocks/ImageBlock'
 import { PullQuote } from '../blocks/PullQuote'
 import { KeyTakeaways } from '../blocks/KeyTakeaways'
 import { CTAGroup } from '../blocks/CTAGroup'
 import { ChartJS } from '../blocks/ChartJS'
+
 import { slugify } from '../utils/slugify'
 import { verifyPreviewToken } from '../utils/previewToken'
 
-const countWords = (text?: string): number => {
+// -----------------------------
+// Helpers (no any)
+// -----------------------------
+
+const countWords = (text?: string | null): number => {
   if (!text) return 0
   return (text.trim().match(/\b\w+\b/g) || []).length
 }
 
-const extractBlockText = (blocks: any[]): string => {
+// Narrow runtime-checked shapes for the blocks we care about.
+type BaseBlock = { blockType?: string | null } & Record<string, unknown>
+
+type ParagraphBlock = BaseBlock & {
+  blockType: 'paragraph'
+  content?: string | null
+}
+
+type ImageCaptionBlock = BaseBlock & {
+  blockType: 'imageBlock'
+  caption?: string | null
+}
+
+type PullQuoteBlock = BaseBlock & {
+  blockType: 'pullQuote'
+  quote?: string | null
+  attribution?: string | null
+}
+
+type KeyTakeawaysBlock = BaseBlock & {
+  blockType: 'keyTakeaways'
+  items?: { text?: string | null }[] | null
+}
+
+type CTAGroupBlock = BaseBlock & {
+  blockType: 'ctaGroup'
+  ctas?: { label?: string | null }[] | null
+}
+
+type ChartJSBlock = BaseBlock & {
+  blockType: 'chartJS'
+  caption?: string | null
+}
+
+type KnownBlocks =
+  | ParagraphBlock
+  | ImageCaptionBlock
+  | PullQuoteBlock
+  | KeyTakeawaysBlock
+  | CTAGroupBlock
+  | ChartJSBlock
+
+function isKnownBlock(b: unknown): b is KnownBlocks {
+  return (
+    typeof b === 'object' &&
+    b !== null &&
+    'blockType' in (b as Record<string, unknown>) &&
+    typeof (b as Record<string, unknown>).blockType === 'string'
+  )
+}
+
+const extractBlockText = (blocks: unknown[]): string => {
   const parts: string[] = []
-  for (const b of blocks || []) {
-    switch (b.blockType) {
-      case 'paragraph':
-        // lexical richText stores JSON; fall back to plaintext if present
-        if (typeof b.content === 'string') parts.push(b.content)
+  for (const raw of blocks || []) {
+    if (!isKnownBlock(raw)) continue
+    switch (raw.blockType) {
+      case 'paragraph': {
+        const content = (raw as ParagraphBlock).content
+        if (typeof content === 'string' && content.trim()) parts.push(content)
         break
-      case 'imageBlock':
-        if (b.caption) parts.push(b.caption)
+      }
+      case 'imageBlock': {
+        const caption = (raw as ImageCaptionBlock).caption
+        if (typeof caption === 'string' && caption.trim()) parts.push(caption)
         break
-      case 'pullQuote':
-        if (b.quote) parts.push(b.quote)
-        if (b.attribution) parts.push(b.attribution)
+      }
+      case 'pullQuote': {
+        const { quote, attribution } = raw as PullQuoteBlock
+        if (typeof quote === 'string' && quote.trim()) parts.push(quote)
+        if (typeof attribution === 'string' && attribution.trim()) parts.push(attribution)
         break
-      case 'keyTakeaways':
-        if (Array.isArray(b.items)) parts.push(b.items.map((i: any) => i?.text || '').join(' '))
+      }
+      case 'keyTakeaways': {
+        const items = (raw as KeyTakeawaysBlock).items || []
+        if (Array.isArray(items) && items.length) {
+          parts.push(
+            items
+              .map((i) => (typeof i?.text === 'string' ? i.text : ''))
+              .filter(Boolean)
+              .join(' '),
+          )
+        }
         break
-      case 'ctaGroup':
-        if (Array.isArray(b.ctas)) parts.push(b.ctas.map((c: any) => c?.label || '').join(' '))
+      }
+      case 'ctaGroup': {
+        const ctas = (raw as CTAGroupBlock).ctas || []
+        if (Array.isArray(ctas) && ctas.length) {
+          parts.push(
+            ctas
+              .map((c) => (typeof c?.label === 'string' ? c.label : ''))
+              .filter(Boolean)
+              .join(' '),
+          )
+        }
         break
-      case 'chartJS':
-        if (b.caption) parts.push(b.caption)
+      }
+      case 'chartJS': {
+        const caption = (raw as ChartJSBlock).caption
+        if (typeof caption === 'string' && caption.trim()) parts.push(caption)
         break
+      }
       default:
         break
     }
   }
   return parts.join(' ')
 }
+
+// -----------------------------
+// Collection
+// -----------------------------
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -52,17 +139,19 @@ export const Posts: CollectionConfig = {
     group: 'Content',
     defaultColumns: ['title', 'status', 'publishedAt'],
   },
+
   access: {
-    read: async ({ req }) => {
-      // Public can read published posts; drafts allowed with preview token or auth
-      if ((req as any)?.user) return true
+    // Public can read published posts; drafts allowed with preview token or auth
+    read: (async ({ req }) => {
+      const user = (req as PayloadRequest).user
+      if (user) return true
       if (verifyPreviewToken(req as PayloadRequest)) return true
       return {
         or: [{ status: { equals: 'published' } }],
       }
-    },
+    }) as Access,
   },
-  // Using explicit status field and preview-token access instead of versions/drafts
+
   fields: [
     {
       name: 'title',
@@ -85,20 +174,20 @@ export const Posts: CollectionConfig = {
     {
       name: 'author',
       type: 'relationship',
-      relationTo: 'authors' as unknown as any,
+      relationTo: 'authors' as unknown as import('payload').CollectionSlug,
       required: true,
     },
     {
       name: 'topics',
       type: 'relationship',
-      relationTo: 'topics' as unknown as any,
+      relationTo: 'topics' as unknown as import('payload').CollectionSlug,
       hasMany: true,
       admin: { description: 'Pick 1–3 topics to help readers find this post.' },
     },
     {
       name: 'publishedAt',
       type: 'date',
-      defaultValue: () => new Date(),
+      defaultValue: () => new Date().toISOString(),
       admin: { description: 'Publication date; defaults to now.' },
     },
     {
@@ -155,19 +244,25 @@ export const Posts: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
   ],
+
   hooks: {
     beforeValidate: [
       ({ data }) => {
         if (!data) return data
-        if (!data.slug && data.title) data.slug = slugify(data.title)
+        if (!data.slug && typeof data.title === 'string') {
+          data.slug = slugify(data.title)
+        }
         return data
       },
     ],
     beforeChange: [
       ({ data }) => {
         if (!data) return data
-        const words = countWords(data.dek) + countWords(extractBlockText(data.body || []))
-        data.readTime = Math.max(1, Math.ceil(words / 200))
+        const bodyBlocks: unknown[] = Array.isArray(data.body) ? data.body : []
+        const words =
+          countWords(typeof data.dek === 'string' ? data.dek : undefined) +
+          countWords(extractBlockText(bodyBlocks))
+        data.readTime = Math.max(1, Math.ceil(words / 200)) // 200 wpm
         return data
       },
     ],
@@ -179,12 +274,11 @@ export const Posts: CollectionConfig = {
             const secret = process.env.REVALIDATE_SECRET
             if (url && secret && doc.slug) {
               const u = new URL(url)
-              // also pass secret in query for handlers that expect it
               if (!u.searchParams.get('secret')) u.searchParams.set('secret', secret)
               const payload = {
-                slug: doc.slug,
-                type: 'post',
-                path: `/posts/${doc.slug}`,
+                slug: String(doc.slug),
+                type: 'post' as const,
+                path: `/posts/${String(doc.slug)}`,
                 secret,
               }
               const res = await fetch(u.toString(), {
@@ -195,6 +289,7 @@ export const Posts: CollectionConfig = {
                 },
                 body: JSON.stringify(payload),
               }).catch(() => undefined)
+
               if (!res || !res.ok) {
                 console.warn('Revalidate webhook failed', {
                   status: res?.status,

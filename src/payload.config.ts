@@ -1,4 +1,4 @@
-import { buildConfig } from 'payload'
+import { buildConfig, type CollectionSlug } from 'payload'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
@@ -21,7 +21,6 @@ import { WhyChoose } from './collections/homepage/WhyChoose'
 import { TrustedBy } from './collections/homepage/TrustedBy'
 import { CTABanner } from './collections/homepage/CTABanner'
 import { ApiKeys } from './collections/ApiKeys'
-// no direct import of admin components; referenced via import map paths
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -44,37 +43,61 @@ if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is missing. Check your Render environment variables.')
 }
 
+/**
+ * Preview token endpoint.
+ * We avoid binding to a specific PayloadHandler tuple across versions by not annotating here
+ * and casting at the usage site.
+ */
+const previewTokenHandler = async (...args: unknown[]) => {
+  const res = args[1] as { status: (code: number) => { json: (v: unknown) => unknown } }
+  const next = args[2] as ((err?: unknown) => unknown) | undefined
+
+  try {
+    const secret = process.env.PREVIEW_SECRET || process.env.PAYLOAD_SECRET || ''
+    if (!secret) {
+      return res.status(500).json({ error: 'Missing PREVIEW_SECRET' })
+    }
+    const exp = Date.now() + 5 * 60 * 1000 // 5 minutes
+    const body = { exp, sub: 'preview' }
+    const data = Buffer.from(JSON.stringify(body)).toString('base64url')
+    const crypto = await import('crypto')
+    const signature = crypto.createHmac('sha256', secret).update(data).digest('base64url')
+    const token = `${data}.${signature}`
+    return res.status(200).json({ token, exp })
+  } catch (err) {
+    if (typeof next === 'function') return next(err)
+    return res.status(500).json({ error: 'Failed to create token' })
+  }
+}
+
 export default buildConfig({
   admin: {
     user: Users.slug,
-    meta: {
-      titleSuffix: ' • EcoFocus CMS',
-    },
+    meta: { titleSuffix: ' • EcoFocus CMS' },
+
+    // Keep only the custom Logo override. This type expects a module path string here.
     components: {
-      graphics: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Logo: {
-          path: '@/ui/admin/EcoFocusLogo',
-        } as unknown as any,
-      },
-      views: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Dashboard: {
-          path: '@/ui/admin/WelcomeDashboard',
-        } as unknown as any,
-      },
+      graphics: { Logo: { path: './ui/admin/EcoFocusLogo' } },
+      // NOTE: remove Dashboard override for now to satisfy AdminViewConfig types
+      // views: { Dashboard: { path: './ui/admin/WelcomeDashboard' } },
     },
+
+    // NOTE: remove admin.routes — your installed types expect a named routes object,
+    // and 'path' must be a URL ('/...'), not a module path.
+    // routes: [ ... ]  <-- removed intentionally
   },
+
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
   cors: ['https://ecofocusresearch.netlify.app', 'http://localhost:3000'],
   csrf: ['https://ecofocusresearch.netlify.app', 'http://localhost:3000'],
   defaultDepth: 2,
+
   collections: [
     Users,
-    Media,
-    Authors,
-    Topics,
-    Posts,
+    Media, // slug: 'media'
+    Authors, // slug: 'authors'
+    Topics, // slug: 'topics'
+    Posts, // slug: 'posts'
     HeroSection,
     QuickStats,
     FeaturedReport,
@@ -85,25 +108,24 @@ export default buildConfig({
     CTABanner,
     ApiKeys,
   ],
+
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [
       ...defaultFeatures,
       LinkFeature({
-        // Allow linking to external URLs and internal documents
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        enabledCollections: [
-          'posts',
-          'topics',
-          'authors',
-          'media',
-        ] as unknown as import('payload').CollectionSlug[],
+        // Internal linking targets — typed by CollectionSlug
+        enabledCollections: ['posts', 'topics', 'authors', 'media'] as CollectionSlug[],
       }),
     ],
   }),
+
   secret: process.env.PAYLOAD_SECRET || '',
+
+  // Generate TS types for stricter typing across the app
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
+
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
@@ -111,33 +133,18 @@ export default buildConfig({
     },
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
+
   sharp,
+
   endpoints: [
     {
       path: '/preview-token',
       method: 'post',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handler: (async (req: any, res: any, _next: any, _ctx: any) => {
-        try {
-          const secret = process.env.PREVIEW_SECRET || process.env.PAYLOAD_SECRET || ''
-          if (!secret) {
-            return res.status(500).json({ error: 'Missing PREVIEW_SECRET' })
-          }
-          const exp = Date.now() + 5 * 60 * 1000 // 5 minutes
-          const payload = { exp, sub: 'preview' }
-          const data = Buffer.from(JSON.stringify(payload)).toString('base64url')
-          const crypto = await import('crypto')
-          const signature = crypto.createHmac('sha256', secret).update(data).digest('base64url')
-          const token = `${data}.${signature}`
-          return res.status(200).json({ token, exp })
-        } catch (_e) {
-          return res.status(500).json({ error: 'Failed to create token' })
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      }) as unknown as any,
+      // Cast here so the handler matches whichever PayloadHandler tuple your version expects
+      handler: previewTokenHandler as unknown as import('payload').PayloadHandler,
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ] as unknown as any,
+  ],
+
   plugins: [
     payloadCloudPlugin(),
     s3Storage({
