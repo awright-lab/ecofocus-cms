@@ -167,3 +167,28 @@ export async function getDatasetRows(args: GetDatasetRowsArgs): Promise<DatasetR
   }
 }
 
+export async function getDatasetDoc(args: {
+  id?: string;
+  slug?: string;
+  baseUrl?: string;
+  previewToken?: string | null;
+}): Promise<DatasetDoc | null> {
+  const { id, slug, baseUrl, previewToken } = args;
+  if (!id && !slug) return null;
+  const path = id
+    ? `/datasets/by-id/${encodeURIComponent(id)}`
+    : `/datasets/${encodeURIComponent(slug as string)}`;
+  const url = (baseUrl ? baseUrl.replace(/\/$/, '') : '') + path;
+  try {
+    const res = await fetch(url, {
+      headers: previewToken ? { Authorization: `Bearer ${previewToken}` } : undefined,
+      cache: previewToken ? 'no-store' : 'force-cache',
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    // Expecting a document with at least id, slug, visibility, schema, isLarge, stats
+    return json as DatasetDoc;
+  } catch {
+    return null;
+  }
+}

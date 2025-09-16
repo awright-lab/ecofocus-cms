@@ -4,6 +4,7 @@ import { ImageBlock } from '../blocks/ImageBlock'
 import { PullQuote } from '../blocks/PullQuote'
 import { KeyTakeaways } from '../blocks/KeyTakeaways'
 import { CTAGroup } from '../blocks/CTAGroup'
+import { ChartJS } from '../blocks/ChartJS'
 import { slugify } from '../utils/slugify'
 import { verifyPreviewToken } from '../utils/previewToken'
 
@@ -33,6 +34,9 @@ const extractBlockText = (blocks: any[]): string => {
       case 'ctaGroup':
         if (Array.isArray(b.ctas)) parts.push(b.ctas.map((c: any) => c?.label || '').join(' '))
         break
+      case 'chartJS':
+        if (b.caption) parts.push(b.caption)
+        break
       default:
         break
     }
@@ -43,24 +47,41 @@ const extractBlockText = (blocks: any[]): string => {
 export const Posts: CollectionConfig = {
   slug: 'posts',
   labels: { singular: 'Post', plural: 'Posts' },
-  admin: { useAsTitle: 'title', group: 'Content', defaultColumns: ['title', 'status', 'publishedAt'] },
+  admin: {
+    useAsTitle: 'title',
+    group: 'Content',
+    defaultColumns: ['title', 'status', 'publishedAt'],
+  },
   access: {
     read: async ({ req }) => {
       // Public can read published posts; drafts allowed with preview token or auth
-      if (req.user) return true
+      if ((req as any)?.user) return true
       if (verifyPreviewToken(req as PayloadRequest)) return true
       return {
-        or: [
-          { status: { equals: 'published' } },
-        ],
+        or: [{ status: { equals: 'published' } }],
       }
     },
   },
   // Using explicit status field and preview-token access instead of versions/drafts
   fields: [
-    { name: 'title', type: 'text', required: true, admin: { description: 'Headline for the article.' } },
-    { name: 'slug', type: 'text', unique: true, index: true, admin: { description: 'URL-friendly identifier; auto-generated from the title.' } },
-    { name: 'dek', type: 'textarea', admin: { description: '1–2 sentence summary shown on lists and social.' } },
+    {
+      name: 'title',
+      type: 'text',
+      required: true,
+      admin: { description: 'Headline for the article.' },
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      unique: true,
+      index: true,
+      admin: { description: 'URL-friendly identifier; auto-generated from the title.' },
+    },
+    {
+      name: 'dek',
+      type: 'textarea',
+      admin: { description: '1–2 sentence summary shown on lists and social.' },
+    },
     {
       name: 'author',
       type: 'relationship',
@@ -94,16 +115,32 @@ export const Posts: CollectionConfig = {
     {
       name: 'body',
       type: 'blocks',
-      blocks: [Paragraph, ImageBlock, PullQuote, KeyTakeaways, CTAGroup],
-      admin: { description: 'Write your article content with paragraphs, images, quotes, and calls to action.' },
+      blocks: [Paragraph, ImageBlock, PullQuote, KeyTakeaways, CTAGroup, ChartJS],
+      admin: {
+        description:
+          'Write your article content with paragraphs, images, quotes, charts, and calls to action.',
+      },
     },
     {
       name: 'seo',
       type: 'group',
       fields: [
-        { name: 'metaTitle', type: 'text', admin: { description: 'Custom title for search and social (optional).' } },
-        { name: 'metaDescription', type: 'textarea', admin: { description: 'Short description for search and social (optional).' } },
-        { name: 'ogImage', type: 'relationship', relationTo: 'media', admin: { description: 'Override social image (optional).' } },
+        {
+          name: 'metaTitle',
+          type: 'text',
+          admin: { description: 'Custom title for search and social (optional).' },
+        },
+        {
+          name: 'metaDescription',
+          type: 'textarea',
+          admin: { description: 'Short description for search and social (optional).' },
+        },
+        {
+          name: 'ogImage',
+          type: 'relationship',
+          relationTo: 'media',
+          admin: { description: 'Override social image (optional).' },
+        },
       ],
     },
     {
@@ -119,50 +156,59 @@ export const Posts: CollectionConfig = {
     },
   ],
   hooks: {
-    beforeValidate: [({ data }) => {
-      if (!data) return data
-      if (!data.slug && data.title) data.slug = slugify(data.title)
-      return data
-    }],
-    beforeChange: [({ data }) => {
-      if (!data) return data
-      const words = countWords(data.dek) + countWords(extractBlockText(data.body || []))
-      data.readTime = Math.max(1, Math.ceil(words / 200))
-      return data
-    }],
-    afterChange: [async ({ doc, req }) => {
-      try {
-        if (doc?.status === 'published') {
-          const url = process.env.FRONTEND_REVALIDATE_URL
-          const secret = process.env.REVALIDATE_SECRET
-          if (url && secret && doc.slug) {
-            const u = new URL(url)
-            // also pass secret in query for handlers that expect it
-            if (!u.searchParams.get('secret')) u.searchParams.set('secret', secret)
-            const payload = {
-              slug: doc.slug,
-              type: 'post',
-              path: `/posts/${doc.slug}`,
-              secret,
+    beforeValidate: [
+      ({ data }) => {
+        if (!data) return data
+        if (!data.slug && data.title) data.slug = slugify(data.title)
+        return data
+      },
+    ],
+    beforeChange: [
+      ({ data }) => {
+        if (!data) return data
+        const words = countWords(data.dek) + countWords(extractBlockText(data.body || []))
+        data.readTime = Math.max(1, Math.ceil(words / 200))
+        return data
+      },
+    ],
+    afterChange: [
+      async ({ doc }) => {
+        try {
+          if (doc?.status === 'published') {
+            const url = process.env.FRONTEND_REVALIDATE_URL
+            const secret = process.env.REVALIDATE_SECRET
+            if (url && secret && doc.slug) {
+              const u = new URL(url)
+              // also pass secret in query for handlers that expect it
+              if (!u.searchParams.get('secret')) u.searchParams.set('secret', secret)
+              const payload = {
+                slug: doc.slug,
+                type: 'post',
+                path: `/posts/${doc.slug}`,
+                secret,
+              }
+              const res = await fetch(u.toString(), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-secret': secret,
+                },
+                body: JSON.stringify(payload),
+              }).catch(() => undefined)
+              if (!res || !res.ok) {
+                console.warn('Revalidate webhook failed', {
+                  status: res?.status,
+                  url: u.toString(),
+                })
+              }
+            } else {
+              console.warn('Missing FRONTEND_REVALIDATE_URL or REVALIDATE_SECRET; skip revalidate')
             }
-            const res = await fetch(u.toString(), {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'x-secret': secret,
-              },
-              body: JSON.stringify(payload),
-            }).catch(() => undefined)
-            if (!res || !res.ok) {
-              console.warn('Revalidate webhook failed', { status: res?.status, url: u.toString() })
-            }
-          } else {
-            console.warn('Missing FRONTEND_REVALIDATE_URL or REVALIDATE_SECRET; skip revalidate')
           }
+        } catch (e) {
+          console.warn('Error in posts.afterChange revalidate', e)
         }
-      } catch (e) {
-        console.warn('Error in posts.afterChange revalidate', e)
-      }
-    }],
+      },
+    ],
   },
 }
