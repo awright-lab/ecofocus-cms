@@ -8,6 +8,7 @@ import * as migration_20250910_000003 from './20250910_000003';
 import * as migration_20250910_000004 from './20250910_000004';
 import * as migration_20250911_000005 from './20250911_000005';
 import * as migration_20250916_ensure_datasets_and_charts from './20250916_ensure_datasets_and_charts';
+import * as migration_20250916_add_datasets_to_locked_rels from './20250916_add_datasets_to_locked_rels';
 
 export const migrations = [
   {
@@ -54,6 +55,11 @@ export const migrations = [
     up: migration_20250911_000005.up,
     down: migration_20250911_000005.down,
     name: '20250911_000005',
+  },
+  {
+    up: migration_20250916_add_datasets_to_locked_rels.up,
+    down: migration_20250916_add_datasets_to_locked_rels.down,
+    name: '20250916_add_datasets_to_locked_rels',
   },
   {
     up: migration_20250916_ensure_datasets_and_charts.up,
