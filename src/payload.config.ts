@@ -52,11 +52,13 @@ export default buildConfig({
     },
     components: {
       graphics: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Logo: {
           path: '@/ui/admin/EcoFocusLogo',
         } as unknown as any,
       },
       views: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Dashboard: {
           path: '@/ui/admin/WelcomeDashboard',
         } as unknown as any,
@@ -64,14 +66,8 @@ export default buildConfig({
     },
   },
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
-  cors: [
-    'https://ecofocusresearch.netlify.app',
-    'http://localhost:3000',
-  ],
-  csrf: [
-    'https://ecofocusresearch.netlify.app',
-    'http://localhost:3000',
-  ],
+  cors: ['https://ecofocusresearch.netlify.app', 'http://localhost:3000'],
+  csrf: ['https://ecofocusresearch.netlify.app', 'http://localhost:3000'],
   defaultDepth: 2,
   collections: [
     Users,
@@ -94,7 +90,13 @@ export default buildConfig({
       ...defaultFeatures,
       LinkFeature({
         // Allow linking to external URLs and internal documents
-        enabledCollections: ['posts', 'topics', 'authors', 'media'] as unknown as import('payload').CollectionSlug[],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        enabledCollections: [
+          'posts',
+          'topics',
+          'authors',
+          'media',
+        ] as unknown as import('payload').CollectionSlug[],
       }),
     ],
   }),
@@ -110,10 +112,11 @@ export default buildConfig({
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
   sharp,
-  endpoints: ([
+  endpoints: [
     {
       path: '/preview-token',
       method: 'post',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       handler: (async (req: any, res: any, _next: any, _ctx: any) => {
         try {
           const secret = process.env.PREVIEW_SECRET || process.env.PAYLOAD_SECRET || ''
@@ -124,18 +127,17 @@ export default buildConfig({
           const payload = { exp, sub: 'preview' }
           const data = Buffer.from(JSON.stringify(payload)).toString('base64url')
           const crypto = await import('crypto')
-          const signature = crypto
-            .createHmac('sha256', secret)
-            .update(data)
-            .digest('base64url')
+          const signature = crypto.createHmac('sha256', secret).update(data).digest('base64url')
           const token = `${data}.${signature}`
           return res.status(200).json({ token, exp })
         } catch (_e) {
           return res.status(500).json({ error: 'Failed to create token' })
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }) as unknown as any,
     },
-  ] as unknown as any),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ] as unknown as any,
   plugins: [
     payloadCloudPlugin(),
     s3Storage({
