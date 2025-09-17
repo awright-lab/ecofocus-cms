@@ -14,7 +14,7 @@ export async function up({ payload }: MigrateUpArgs): Promise<void> {
           AND column_name = 'label'
       ) THEN
         ALTER TABLE "posts_blocks_chart_j_s_y_fields"
-          ADD COLUMN "label" varchar;
+          ADD COLUMN "label" text;
       END IF;
     END$$;
   `)
@@ -135,4 +135,3 @@ export async function down({ payload }: MigrateDownArgs): Promise<void> {
 
   // Note: We do not attempt to remove the added enum value 'doughnut'. Reverting enum values is non-trivial and unnecessary.
 }
-
