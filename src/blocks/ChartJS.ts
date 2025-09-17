@@ -13,12 +13,25 @@ export const ChartJS: Block = {
       options: [
         { label: 'Bar', value: 'bar' },
         { label: 'Line', value: 'line' },
-        { label: 'Area', value: 'area' },
+        { label: 'Area (filled line)', value: 'area' }, // map to line+fill in transformer
         { label: 'Pie', value: 'pie' },
-        { label: 'Donut', value: 'donut' },
+        { label: 'Doughnut', value: 'doughnut' }, // ✅ use Chart.js name
         { label: 'Scatter', value: 'scatter' },
       ],
     },
+
+    // Orientation (only relevant for bars)
+    {
+      name: 'orientation',
+      type: 'select',
+      defaultValue: 'column',
+      options: [
+        { label: 'Columns (vertical bars)', value: 'column' },
+        { label: 'Rows (horizontal bars)', value: 'row' },
+      ],
+      admin: { condition: (data) => data?.chartType === 'bar' },
+    },
+
     {
       type: 'row',
       fields: [
@@ -40,13 +53,17 @@ export const ChartJS: Block = {
         },
       ],
     },
+
     {
       name: 'yFields',
       type: 'array',
       required: true,
       minRows: 1,
       admin: { description: 'One or more numeric fields to plot.' },
-      fields: [{ name: 'field', type: 'text', required: true }],
+      fields: [
+        { name: 'field', type: 'text', required: true },
+        { name: 'label', type: 'text', required: false }, // legend label override
+      ],
       validate: (val) => (Array.isArray(val) && val.length > 0 ? true : 'Add at least one yField'),
     },
 
@@ -58,7 +75,7 @@ export const ChartJS: Block = {
         {
           name: 'dataset',
           type: 'relationship',
-          relationTo: 'datasets' as unknown as import('payload').CollectionSlug, // temporary cast if your generated types don’t include 'datasets' yet
+          relationTo: 'datasets' as unknown as import('payload').CollectionSlug,
           required: false,
           admin: { description: 'Reference a reusable dataset (preferred).' },
         },
@@ -75,7 +92,6 @@ export const ChartJS: Block = {
           },
         },
       ],
-      // ✅ Correct validate signature for Group field
       validate: (value) => {
         const v = (typeof value === 'object' && value !== null ? value : {}) as {
           dataset?: unknown
@@ -103,13 +119,66 @@ export const ChartJS: Block = {
         },
       ],
     },
+
+    // Gridline controls
     {
-      type: 'row',
-      fields: [
-        { name: 'xLabel', type: 'text', required: false, admin: { width: '50%' } },
-        { name: 'yLabel', type: 'text', required: false, admin: { width: '50%' } },
-      ],
+        name: 'grid',
+        type: 'group',
+        admin: { description: 'Gridline styling (leave defaults to lightly dim the grid).' },
+        fields: [
+          {
+            name: 'showX',
+            type: 'checkbox',
+            label: 'Show X grid',        // <-- moved here
+            defaultValue: true,
+            admin: { width: '25%' },
+          },
+          {
+            name: 'showY',
+            type: 'checkbox',
+            label: 'Show Y grid',        // <-- moved here
+            defaultValue: true,
+            admin: { width: '25%' },
+          },
+          {
+            name: 'drawBorder',
+            type: 'checkbox',
+            label: 'Draw chart border',  // <-- moved here
+            defaultValue: false,
+            admin: { width: '25%' },
+          },
+          {
+            name: 'dim',
+            type: 'checkbox',
+            label: 'Dim gridlines',      // <-- moved here
+            defaultValue: true,
+            admin: { width: '25%' },
+          },
+          {
+            name: 'color',
+            type: 'text',
+            label: 'Grid color (optional)',
+            required: false,
+            admin: {
+              description:
+                'RGBA/hex (e.g., rgba(0,0,0,0.08)). If empty and "Dim" is on, a faint default is used.',
+            },
+          },
+        ],
+      },
+      
+    // Bar rounding (bars only; ignored for other charts)
+    {
+      name: 'barRadius',
+      type: 'number',
+      defaultValue: 8,
+      admin: {
+        description: 'Rounded corners for bar charts.',
+        condition: (data) => data?.chartType === 'bar',
+      },
     },
+
+    // Series colors come from here (kept as-is)
     {
       name: 'colorPalette',
       type: 'array',
