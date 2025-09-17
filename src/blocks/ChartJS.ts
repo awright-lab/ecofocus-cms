@@ -15,22 +15,25 @@ export const ChartJS: Block = {
         { label: 'Line', value: 'line' },
         { label: 'Area (filled line)', value: 'area' }, // map to line+fill in transformer
         { label: 'Pie', value: 'pie' },
-        { label: 'Doughnut', value: 'doughnut' }, // ✅ use Chart.js name
+        { label: 'Doughnut', value: 'doughnut' }, // Chart.js name
         { label: 'Scatter', value: 'scatter' },
       ],
     },
-    
 
-    // Orientation (only relevant for bars)
+    // Orientation (only for bars)
     {
       name: 'orientation',
+      label: 'Bar orientation',
       type: 'select',
       defaultValue: 'column',
       options: [
         { label: 'Columns (vertical bars)', value: 'column' },
         { label: 'Rows (horizontal bars)', value: 'row' },
       ],
-      admin: { condition: (data) => data?.chartType === 'bar' },
+      admin: {
+        // IMPORTANT: use siblingData in blocks
+        condition: (data, siblingData) => (siblingData ?? data)?.chartType === 'bar',
+      },
     },
 
     {
@@ -68,7 +71,7 @@ export const ChartJS: Block = {
       validate: (val) => (Array.isArray(val) && val.length > 0 ? true : 'Add at least one yField'),
     },
 
-    // Data source: either pick a dataset doc or paste inline rows
+    // Data source
     {
       name: 'dataSource',
       type: 'group',
@@ -123,63 +126,63 @@ export const ChartJS: Block = {
 
     // Gridline controls
     {
-        name: 'grid',
-        type: 'group',
-        admin: { description: 'Gridline styling (leave defaults to lightly dim the grid).' },
-        fields: [
-          {
-            name: 'showX',
-            type: 'checkbox',
-            label: 'Show X grid',        // <-- moved here
-            defaultValue: true,
-            admin: { width: '25%' },
+      name: 'grid',
+      type: 'group',
+      admin: { description: 'Gridline styling (leave defaults to lightly dim the grid).' },
+      fields: [
+        {
+          name: 'showX',
+          type: 'checkbox',
+          label: 'Show X grid',
+          defaultValue: true,
+          admin: { width: '25%' },
+        },
+        {
+          name: 'showY',
+          type: 'checkbox',
+          label: 'Show Y grid',
+          defaultValue: true,
+          admin: { width: '25%' },
+        },
+        {
+          name: 'drawBorder',
+          type: 'checkbox',
+          label: 'Draw chart border',
+          defaultValue: false,
+          admin: { width: '25%' },
+        },
+        {
+          name: 'dim',
+          type: 'checkbox',
+          label: 'Dim gridlines',
+          defaultValue: true,
+          admin: { width: '25%' },
+        },
+        {
+          name: 'color',
+          type: 'text',
+          label: 'Grid color (optional)',
+          required: false,
+          admin: {
+            description:
+              'RGBA/hex (e.g., rgba(0,0,0,0.08)). If empty and "Dim" is on, a faint default is used.',
           },
-          {
-            name: 'showY',
-            type: 'checkbox',
-            label: 'Show Y grid',        // <-- moved here
-            defaultValue: true,
-            admin: { width: '25%' },
-          },
-          {
-            name: 'drawBorder',
-            type: 'checkbox',
-            label: 'Draw chart border',  // <-- moved here
-            defaultValue: false,
-            admin: { width: '25%' },
-          },
-          {
-            name: 'dim',
-            type: 'checkbox',
-            label: 'Dim gridlines',      // <-- moved here
-            defaultValue: true,
-            admin: { width: '25%' },
-          },
-          {
-            name: 'color',
-            type: 'text',
-            label: 'Grid color (optional)',
-            required: false,
-            admin: {
-              description:
-                'RGBA/hex (e.g., rgba(0,0,0,0.08)). If empty and "Dim" is on, a faint default is used.',
-            },
-          },
-        ],
-      },
-      
-    // Bar rounding (bars only; ignored for other charts)
+        },
+      ],
+    },
+
+    // Bar rounding (bars only)
     {
       name: 'barRadius',
       type: 'number',
       defaultValue: 8,
       admin: {
         description: 'Rounded corners for bar charts.',
-        condition: (data) => data?.chartType === 'bar',
+        condition: (data, siblingData) => (siblingData ?? data)?.chartType === 'bar',
       },
     },
 
-    // Series colors come from here (kept as-is)
+    // Series colors
     {
       name: 'colorPalette',
       type: 'array',
