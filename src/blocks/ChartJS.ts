@@ -19,6 +19,7 @@ export const ChartJS: Block = {
         { label: 'Scatter', value: 'scatter' },
       ],
     },
+    
 
     // Orientation (only relevant for bars)
     {
