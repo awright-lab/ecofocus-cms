@@ -9,6 +9,7 @@ import * as migration_20250910_000004 from './20250910_000004';
 import * as migration_20250911_000005 from './20250911_000005';
 import * as migration_20250916_ensure_datasets_and_charts from './20250916_ensure_datasets_and_charts';
 import * as migration_20250916_add_datasets_to_locked_rels from './20250916_add_datasets_to_locked_rels';
+import * as migration_20250917_add_chartjs_missing_columns from './20250917_add_chartjs_missing_columns';
 
 export const migrations = [
   {
@@ -65,5 +66,10 @@ export const migrations = [
     up: migration_20250916_ensure_datasets_and_charts.up,
     down: migration_20250916_ensure_datasets_and_charts.down,
     name: '20250916_ensure_datasets_and_charts',
+  },
+  {
+    up: migration_20250917_add_chartjs_missing_columns.up,
+    down: migration_20250917_add_chartjs_missing_columns.down,
+    name: '20250917_add_chartjs_missing_columns',
   },
 ];
