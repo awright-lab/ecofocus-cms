@@ -23,6 +23,7 @@ const WelcomeDashboard: React.FC = () => {
         <Card title="Quick Actions">
           <ul style={{ margin: 0, paddingLeft: 18 }}>
             <li><Link href="/admin/collections/posts/create">Create a Post</Link></li>
+            <li><Link href="/admin/stripo-import">Import Stripo HTML</Link></li>
             <li><Link href="/admin/collections/authors">Manage Authors</Link></li>
             <li><Link href="/admin/collections/topics">Manage Topics</Link></li>
             <li><Link href="/admin/collections/media">Upload Media</Link></li>
@@ -40,4 +41,3 @@ const WelcomeDashboard: React.FC = () => {
 }
 
 export default WelcomeDashboard
-

@@ -77,6 +77,7 @@ export default buildConfig({
     meta: { titleSuffix: ' • EcoFocus CMS' },
     components: {
       graphics: { Logo: { path: 'src/ui/admin/EcoFocusLogo.tsx' } },
+      beforeDashboard: [{ path: 'src/ui/admin/WelcomeDashboard.tsx' }],
     },
   },
 
