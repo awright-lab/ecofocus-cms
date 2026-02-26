@@ -14,6 +14,7 @@
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "payload:migrate": "payload migrate",
     "migrate:create": "payload migrate:create",
+    "backfill:readtime": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/backfillPostReadTimes.ts",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },
   "dependencies": {

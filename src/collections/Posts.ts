@@ -9,123 +9,7 @@ import { ChartJS } from '../blocks/ChartJS'
 
 import { slugify } from '../utils/slugify'
 import { verifyPreviewToken } from '../utils/previewToken'
-
-// -----------------------------
-// Helpers (no any)
-// -----------------------------
-
-const countWords = (text?: string | null): number => {
-  if (!text) return 0
-  return (text.trim().match(/\b\w+\b/g) || []).length
-}
-
-// Narrow runtime-checked shapes for the blocks we care about.
-type BaseBlock = { blockType?: string | null } & Record<string, unknown>
-
-type ParagraphBlock = BaseBlock & {
-  blockType: 'paragraph'
-  content?: string | null
-}
-
-type ImageCaptionBlock = BaseBlock & {
-  blockType: 'imageBlock'
-  caption?: string | null
-}
-
-type PullQuoteBlock = BaseBlock & {
-  blockType: 'pullQuote'
-  quote?: string | null
-  attribution?: string | null
-}
-
-type KeyTakeawaysBlock = BaseBlock & {
-  blockType: 'keyTakeaways'
-  items?: { text?: string | null }[] | null
-}
-
-type CTAGroupBlock = BaseBlock & {
-  blockType: 'ctaGroup'
-  ctas?: { label?: string | null }[] | null
-}
-
-type ChartJSBlock = BaseBlock & {
-  blockType: 'chartJS'
-  caption?: string | null
-}
-
-type KnownBlocks =
-  | ParagraphBlock
-  | ImageCaptionBlock
-  | PullQuoteBlock
-  | KeyTakeawaysBlock
-  | CTAGroupBlock
-  | ChartJSBlock
-
-function isKnownBlock(b: unknown): b is KnownBlocks {
-  return (
-    typeof b === 'object' &&
-    b !== null &&
-    'blockType' in (b as Record<string, unknown>) &&
-    typeof (b as Record<string, unknown>).blockType === 'string'
-  )
-}
-
-const extractBlockText = (blocks: unknown[]): string => {
-  const parts: string[] = []
-  for (const raw of blocks || []) {
-    if (!isKnownBlock(raw)) continue
-    switch (raw.blockType) {
-      case 'paragraph': {
-        const content = (raw as ParagraphBlock).content
-        if (typeof content === 'string' && content.trim()) parts.push(content)
-        break
-      }
-      case 'imageBlock': {
-        const caption = (raw as ImageCaptionBlock).caption
-        if (typeof caption === 'string' && caption.trim()) parts.push(caption)
-        break
-      }
-      case 'pullQuote': {
-        const { quote, attribution } = raw as PullQuoteBlock
-        if (typeof quote === 'string' && quote.trim()) parts.push(quote)
-        if (typeof attribution === 'string' && attribution.trim()) parts.push(attribution)
-        break
-      }
-      case 'keyTakeaways': {
-        const items = (raw as KeyTakeawaysBlock).items || []
-        if (Array.isArray(items) && items.length) {
-          parts.push(
-            items
-              .map((i) => (typeof i?.text === 'string' ? i.text : ''))
-              .filter(Boolean)
-              .join(' '),
-          )
-        }
-        break
-      }
-      case 'ctaGroup': {
-        const ctas = (raw as CTAGroupBlock).ctas || []
-        if (Array.isArray(ctas) && ctas.length) {
-          parts.push(
-            ctas
-              .map((c) => (typeof c?.label === 'string' ? c.label : ''))
-              .filter(Boolean)
-              .join(' '),
-          )
-        }
-        break
-      }
-      case 'chartJS': {
-        const caption = (raw as ChartJSBlock).caption
-        if (typeof caption === 'string' && caption.trim()) parts.push(caption)
-        break
-      }
-      default:
-        break
-    }
-  }
-  return parts.join(' ')
-}
+import { calculateReadTimeMinutes } from '../utils/readTime'
 
 // -----------------------------
 // Collection
@@ -258,11 +142,10 @@ export const Posts: CollectionConfig = {
     beforeChange: [
       ({ data }) => {
         if (!data) return data
-        const bodyBlocks: unknown[] = Array.isArray(data.body) ? data.body : []
-        const words =
-          countWords(typeof data.dek === 'string' ? data.dek : undefined) +
-          countWords(extractBlockText(bodyBlocks))
-        data.readTime = Math.max(1, Math.ceil(words / 200)) // 200 wpm
+        data.readTime = calculateReadTimeMinutes({
+          dek: typeof data.dek === 'string' ? data.dek : undefined,
+          body: Array.isArray(data.body) ? data.body : [],
+        })
         return data
       },
     ],
