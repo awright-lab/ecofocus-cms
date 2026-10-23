@@ -5,7 +5,7 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
   },
-  auth: true,
+  auth: { useAPIKey: true },
   access: {
     read: ({ req }) => ((req.user as any)?.role) === 'admin',
     create: ({ req }) => ((req.user as any)?.role) === 'admin',

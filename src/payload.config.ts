@@ -7,6 +7,9 @@ import { lexicalEditor, LinkFeature } from '@payloadcms/richtext-lexical'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { s3Storage } from '@payloadcms/storage-s3'
 
+import { Reports } from './collections/Reports'
+import { ReportFiles } from './collections/ReportFiles'
+
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Authors } from './collections/Authors'
@@ -88,6 +91,8 @@ export default buildConfig({
 
   collections: [
     Users,
+    Reports,
+    ReportFiles,
     Media, // 'media'
     Authors, // 'authors'
     Topics, // 'topics'
@@ -144,6 +149,16 @@ export default buildConfig({
   ],
 
   plugins: [
+    ...(process.env.REPORTS_S3_BUCKET ? [s3Storage({
+      collections: { 'report-files': { disableLocalStorage: true } },
+      bucket: process.env.REPORTS_S3_BUCKET,
+      config: {
+        endpoint: process.env.S3_ENDPOINT,
+        region: process.env.S3_REGION || 'auto',
+        credentials: { accessKeyId: process.env.S3_ACCESS_KEY_ID || '', secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '' },
+        forcePathStyle: true,
+      },
+    })] : []),
     payloadCloudPlugin(),
     s3Storage({
       collections: {

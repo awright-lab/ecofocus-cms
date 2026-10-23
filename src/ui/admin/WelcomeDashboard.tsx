@@ -17,11 +17,13 @@ const WelcomeDashboard: React.FC = () => {
   return (
     <div style={{ display: 'grid', gap: 16 }}>
       <Card title="Welcome to EcoFocus CMS">
-        <p style={{ margin: 0 }}>Create posts, manage authors, and organize topics.</p>
+        <p style={{ margin: 0 }}>Publish reports, manage research products, and create website content.</p>
       </Card>
       <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
         <Card title="Quick Actions">
           <ul style={{ margin: 0, paddingLeft: 18 }}>
+            <li><Link href="/admin/collections/reports/create">Add a Report</Link></li>
+            <li><Link href="/admin/collections/report-files">Upload Private Report Files</Link></li>
             <li><Link href="/admin/collections/posts/create">Create a Post</Link></li>
             <li><Link href="/admin/stripo-import">Import Stripo HTML</Link></li>
             <li><Link href="/admin/collections/authors">Manage Authors</Link></li>

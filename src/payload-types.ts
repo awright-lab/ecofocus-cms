@@ -68,6 +68,8 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    reports: Report;
+    'report-files': ReportFile;
     media: Media;
     authors: Author;
     topics: Topic;
@@ -89,6 +91,8 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    reports: ReportsSelect<false> | ReportsSelect<true>;
+    'report-files': ReportFilesSelect<false> | ReportFilesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     topics: TopicsSelect<false> | TopicsSelect<true>;
@@ -151,6 +155,9 @@ export interface User {
   role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
   email: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
@@ -169,6 +176,55 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reports".
+ */
+export interface Report {
+  id: number;
+  title: string;
+  /**
+   * URL identifier, for example consumer-sustainability-2026.
+   */
+  slug: string;
+  subtitle?: string | null;
+  description: string;
+  /**
+   * Detailed report overview.
+   */
+  body?: string | null;
+  year: number;
+  type?: ('report' | 'brief' | 'dataset') | null;
+  topic?: string | null;
+  tags?: string[] | null;
+  wave?: string | null;
+  pages?: number | null;
+  format?: string | null;
+  cover: number | Media;
+  access: 'Free' | 'Premium';
+  /**
+   * USD, for example 2000.00. Stripe product and price are created automatically when published.
+   */
+  price?: number | null;
+  /**
+   * Private paid file. Never upload paid reports to public Media.
+   */
+  downloadFile?: (number | null) | ReportFile;
+  /**
+   * Public download URL for free reports only.
+   */
+  freeHref?: string | null;
+  /**
+   * Optional public sample URL.
+   */
+  sampleHref?: string | null;
+  stripeProductId?: string | null;
+  priceId?: string | null;
+  stripeSyncedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
@@ -178,6 +234,27 @@ export interface Media {
    * Alias of alt for frontend compatibility
    */
   altText?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * Private purchased files. Requires a private REPORTS_S3_BUCKET.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "report-files".
+ */
+export interface ReportFile {
+  id: number;
+  label: string;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -346,7 +423,8 @@ export interface Post {
         | KeyTakeawaysBlock
         | CTAGroupBlock
         | {
-            chartType: 'bar' | 'line' | 'area' | 'pie' | 'donut' | 'scatter';
+            chartType: 'bar' | 'line' | 'area' | 'pie' | 'doughnut' | 'scatter';
+            orientation?: ('column' | 'row') | null;
             xField: string;
             /**
              * Optional. If provided, rows are pivoted by this field (series per unique value).
@@ -357,6 +435,7 @@ export interface Post {
              */
             yFields: {
               field: string;
+              label?: string | null;
               id?: string | null;
             }[];
             dataSource?: {
@@ -381,8 +460,23 @@ export interface Post {
             legend?: boolean | null;
             unit?: string | null;
             height?: number | null;
-            xLabel?: string | null;
-            yLabel?: string | null;
+            /**
+             * Gridline styling (leave defaults to lightly dim the grid).
+             */
+            grid?: {
+              showX?: boolean | null;
+              showY?: boolean | null;
+              drawBorder?: boolean | null;
+              dim?: boolean | null;
+              /**
+               * RGBA/hex (e.g., rgba(0,0,0,0.08)). If empty and "Dim" is on, a faint default is used.
+               */
+              color?: string | null;
+            };
+            /**
+             * Rounded corners for bar charts.
+             */
+            barRadius?: number | null;
             /**
              * Optional color hex values in series order.
              */
@@ -626,6 +720,14 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'reports';
+        value: number | Report;
+      } | null)
+    | ({
+        relationTo: 'report-files';
+        value: number | ReportFile;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -731,6 +833,9 @@ export interface UsersSelect<T extends boolean = true> {
   role?: T;
   updatedAt?: T;
   createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
   email?: T;
   resetPasswordToken?: T;
   resetPasswordExpiration?: T;
@@ -745,6 +850,54 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reports_select".
+ */
+export interface ReportsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  subtitle?: T;
+  description?: T;
+  body?: T;
+  year?: T;
+  type?: T;
+  topic?: T;
+  tags?: T;
+  wave?: T;
+  pages?: T;
+  format?: T;
+  cover?: T;
+  access?: T;
+  price?: T;
+  downloadFile?: T;
+  freeHref?: T;
+  sampleHref?: T;
+  stripeProductId?: T;
+  priceId?: T;
+  stripeSyncedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "report-files_select".
+ */
+export interface ReportFilesSelect<T extends boolean = true> {
+  label?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -832,12 +985,14 @@ export interface PostsSelect<T extends boolean = true> {
           | T
           | {
               chartType?: T;
+              orientation?: T;
               xField?: T;
               seriesLabelField?: T;
               yFields?:
                 | T
                 | {
                     field?: T;
+                    label?: T;
                     id?: T;
                   };
               dataSource?:
@@ -850,8 +1005,16 @@ export interface PostsSelect<T extends boolean = true> {
               legend?: T;
               unit?: T;
               height?: T;
-              xLabel?: T;
-              yLabel?: T;
+              grid?:
+                | T
+                | {
+                    showX?: T;
+                    showY?: T;
+                    drawBorder?: T;
+                    dim?: T;
+                    color?: T;
+                  };
+              barRadius?: T;
               colorPalette?:
                 | T
                 | {
