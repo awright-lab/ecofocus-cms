@@ -10,6 +10,7 @@ export async function syncReportToStripe(report, { secret = process.env.STRIPE_S
   }
   const amount = Math.round(report.price * 100)
   if (Math.abs(report.price * 100 - amount) > 0.00001) throw new Error('Use at most two decimal places for the price.')
+  if (amount < 50) throw new Error('Paid reports must cost at least $0.50 USD for card checkout. Use Free for a free download.')
   const request = async (path, method = 'GET', values, key) => {
     const response = await fetcher(`https://api.stripe.com/v1/${path}`, {
       method,

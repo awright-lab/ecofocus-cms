@@ -44,7 +44,7 @@ test('changing a slug reuses the stored product ID', async () => {
   assert.deepEqual(await syncReportToStripe({ ...report, ...first, slug: 'new-slug' }, options), first)
 })
 test('rejects invalid prices and absent credentials before any request', async () => {
-  for (const price of [0, -1, NaN, Infinity, 1.005]) await assert.rejects(syncReportToStripe({ ...report, price }, { secret: 'test', fetcher: () => assert.fail('Unexpected request') }))
+  for (const price of [0, -1, 0.01, 0.49, NaN, Infinity, 1.005]) await assert.rejects(syncReportToStripe({ ...report, price }, { secret: 'test', fetcher: () => assert.fail('Unexpected request') }))
   await assert.rejects(syncReportToStripe(report, { secret: '' }), /STRIPE_SECRET_KEY/)
 })
 test('Stripe failures prevent publishing and inactive prices are rejected', async () => {
@@ -75,4 +75,11 @@ test('Payload publication hook protects Stripe IDs and synchronizes partial upda
   const publicRead = exports.Reports.access.read({ req: {} })
   assert.equal(publicRead._status.equals, 'published')
   assert.equal(exports.Reports.access.create({ req: {} }), false)
+})
+
+
+test('minimum USD report price synchronizes as 50 cents', async () => {
+  const fake = stripe()
+  const result = await syncReportToStripe({ ...report, price: 0.50 }, { secret: 'test', fetcher: fake.fetcher })
+  assert.equal(fake.prices.get(result.priceId).unit_amount, 50)
 })

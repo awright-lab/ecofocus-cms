@@ -56,7 +56,7 @@ export const Reports: CollectionConfig = {
     { name: 'format', type: 'text', defaultValue: 'PDF' },
     { name: 'cover', type: 'upload', relationTo: 'media', required: true },
     { name: 'access', type: 'select', required: true, defaultValue: 'Premium', options: ['Free', 'Premium'] },
-    { name: 'price', type: 'number', min: 0, defaultValue: 0, admin: { description: 'USD, for example 2000.00. Stripe product and price are created automatically when published.', condition: (_, data) => data.access === 'Premium' } },
+    { name: 'price', type: 'number', min: 0, defaultValue: 0, admin: { description: 'USD, minimum 0.50 for paid reports (for example 2000.00). Stripe product and price are created automatically when published.', condition: (_, data) => data.access === 'Premium' } },
     { name: 'downloadFile', type: 'upload', relationTo: 'report-files', access: { read: editor }, admin: { description: 'Private paid file. Never upload paid reports to public Media.', condition: (_, data) => data.access === 'Premium' } },
     { name: 'freeHref', type: 'text', admin: { description: 'Public download URL for free reports only.', condition: (_, data) => data.access === 'Free' } },
     { name: 'sampleHref', type: 'text', admin: { description: 'Optional public sample URL.' } },

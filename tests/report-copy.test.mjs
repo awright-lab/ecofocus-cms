@@ -28,3 +28,15 @@ test('migration skips missing listings and existing editorial changes', async ()
     await exports.up({ payload: { find: async () => ({ docs }), update: async () => assert.fail('Must preserve editorial changes') }, req: {} })
   }
 })
+
+test('approved price correction updates only the one-cent test report', async () => {
+  const source = fs.readFileSync(new URL('../src/migrations/20261024_180000_test_report_minimum_price.ts', import.meta.url), 'utf8')
+  const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText
+  const migration = {}; vm.runInNewContext(compiled, { exports: migration })
+  for (const price of [0.01, 0.50, 10]) {
+    let update
+    await migration.up({ req: {}, payload: { find: async () => ({ docs: [{ id: 1, access: 'Premium', price }] }), update: async args => { update = args } } })
+    if (price === 0.01) { assert.equal(update.data.price, 0.50); assert.deepEqual(Object.keys(update.data), ['price']) }
+    else assert.equal(update, undefined)
+  }
+})
