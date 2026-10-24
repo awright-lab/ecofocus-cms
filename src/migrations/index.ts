@@ -1,3 +1,4 @@
+import * as migration_20261024_170000_test_report_copy from './20261024_170000_test_report_copy';
 import * as migration_20250805_003447 from './20250805_003447';
 import * as migration_20250805_013250 from './20250805_013250';
 import * as migration_20250805_021208 from './20250805_021208';
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20261023_200440_storefront.up,
     down: migration_20261023_200440_storefront.down,
     name: '20261023_200440_storefront'
+  },
+  {
+    up: migration_20261024_170000_test_report_copy.up,
+    down: migration_20261024_170000_test_report_copy.down,
+    name: '20261024_170000_test_report_copy',
   },
 ];
