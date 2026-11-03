@@ -7,6 +7,8 @@ import { lexicalEditor, LinkFeature } from '@payloadcms/richtext-lexical'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { s3Storage } from '@payloadcms/storage-s3'
 
+import { CaseStudyDownloads } from './collections/CaseStudyDownloads'
+
 import { Reports } from './collections/Reports'
 import { ReportFiles } from './collections/ReportFiles'
 
@@ -91,6 +93,7 @@ export default buildConfig({
 
   collections: [
     Users,
+    CaseStudyDownloads,
     Reports,
     ReportFiles,
     Media, // 'media'

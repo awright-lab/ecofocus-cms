@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    'case-study-downloads': CaseStudyDownload;
     reports: Report;
     'report-files': ReportFile;
     media: Media;
@@ -91,6 +92,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    'case-study-downloads': CaseStudyDownloadsSelect<false> | CaseStudyDownloadsSelect<true>;
     reports: ReportsSelect<false> | ReportsSelect<true>;
     'report-files': ReportFilesSelect<false> | ReportFilesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -175,6 +177,21 @@ export interface User {
   password?: string | null;
 }
 /**
+ * PDF download requests only. These records do not subscribe anyone to marketing. Repeat requests are recorded separately.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-study-downloads".
+ */
+export interface CaseStudyDownload {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  caseStudy: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "reports".
  */
@@ -201,7 +218,7 @@ export interface Report {
   cover: number | Media;
   access: 'Free' | 'Premium';
   /**
-   * USD, for example 2000.00. Stripe product and price are created automatically when published.
+   * USD, minimum 0.50 for paid reports (for example 2000.00). Stripe product and price are created automatically when published.
    */
   price?: number | null;
   /**
@@ -720,6 +737,10 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'case-study-downloads';
+        value: number | CaseStudyDownload;
+      } | null)
+    | ({
         relationTo: 'reports';
         value: number | Report;
       } | null)
@@ -850,6 +871,18 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "case-study-downloads_select".
+ */
+export interface CaseStudyDownloadsSelect<T extends boolean = true> {
+  firstName?: T;
+  lastName?: T;
+  email?: T;
+  caseStudy?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,3 +1,4 @@
+import * as migration_20261103_120000_case_study_downloads from './20261103_120000_case_study_downloads';
 import * as migration_20261024_180000_test_report_minimum_price from './20261024_180000_test_report_minimum_price';
 import * as migration_20261024_173000_polish_test_report_note from './20261024_173000_polish_test_report_note';
 import * as migration_20261024_170000_test_report_copy from './20261024_170000_test_report_copy';
@@ -96,4 +97,5 @@ export const migrations = [
     down: migration_20261024_180000_test_report_minimum_price.down,
     name: '20261024_180000_test_report_minimum_price',
   },
+  { up: migration_20261103_120000_case_study_downloads.up, down: migration_20261103_120000_case_study_downloads.down, name: '20261103_120000_case_study_downloads' },
 ];
