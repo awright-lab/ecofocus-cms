@@ -23,7 +23,8 @@ export const CaseStudyDownloads: CollectionConfig = {
   },
   endpoints: [{ path: '/export-csv', method: 'get', handler: exportCaseStudyDownloads }],
   access: { read: downloadAdmin, create: recordDownload, update: () => false, delete: downloadAdmin },
-  // An append-only log needs no document locking relationship.
+  // Disable editing locks for the append-only log. Payload still includes this
+  // collection in its shared polymorphic relationship schema.
   lockDocuments: false,
   timestamps: true,
   fields: [
