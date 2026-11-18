@@ -18,10 +18,11 @@ import { calculateReadTimeMinutes } from '../utils/readTime'
 export const Posts: CollectionConfig = {
   slug: 'posts',
   labels: { singular: 'Post', plural: 'Posts' },
+  versions: { drafts: { schedulePublish: true } },
   admin: {
     useAsTitle: 'title',
     group: 'Content',
-    defaultColumns: ['title', 'status', 'publishedAt'],
+    defaultColumns: ['title', '_status', 'publishedAt'],
   },
 
   access: {
@@ -125,11 +126,27 @@ export const Posts: CollectionConfig = {
         { label: 'Draft', value: 'draft' },
         { label: 'Published', value: 'published' },
       ],
-      admin: { position: 'sidebar' },
+      // Keep the existing status field for API clients and public queries.
+      admin: { hidden: true },
     },
   ],
 
   hooks: {
+    beforeOperation: [
+      ({ args, operation }) => {
+        if (operation !== 'create' && operation !== 'update') return args
+        const { data, draft } = args
+        if (draft && data._status !== 'published') {
+          data._status = 'draft'
+        } else if (
+          data._status === undefined &&
+          (data.status === 'draft' || data.status === 'published')
+        ) {
+          data._status = data.status
+        }
+        return args
+      },
+    ],
     beforeValidate: [
       ({ data }) => {
         if (!data) return data
@@ -142,6 +159,9 @@ export const Posts: CollectionConfig = {
     beforeChange: [
       ({ data }) => {
         if (!data) return data
+        if (data._status === 'draft' || data._status === 'published') {
+          data.status = data._status
+        }
         data.readTime = calculateReadTimeMinutes({
           dek: typeof data.dek === 'string' ? data.dek : undefined,
           body: Array.isArray(data.body) ? data.body : [],
@@ -150,9 +170,10 @@ export const Posts: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc }) => {
+      async ({ doc, operation }) => {
         try {
-          if (doc?.status === 'published') {
+          // An update can also remove a post from public pages.
+          if (doc?.status === 'published' || operation === 'update') {
             const url = process.env.FRONTEND_REVALIDATE_URL
             const secret = process.env.REVALIDATE_SECRET
             if (url && secret && doc.slug) {

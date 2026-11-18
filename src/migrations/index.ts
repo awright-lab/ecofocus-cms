@@ -1,3 +1,4 @@
+import * as migration_20261118_181826_scheduled_posts from './20261118_181826_scheduled_posts';
 import * as migration_20261116_170000_workforce_cover_v6_1 from './20261116_170000_workforce_cover_v6_1';
 import * as migration_20261105_020000_workforce_cover from './20261105_020000_workforce_cover';
 import * as migration_20261104_180000_download_log_lock_relation from './20261104_180000_download_log_lock_relation';
@@ -104,4 +105,5 @@ export const migrations = [
   { up: migration_20261104_180000_download_log_lock_relation.up, down: migration_20261104_180000_download_log_lock_relation.down, name: '20261104_180000_download_log_lock_relation' },
   { up: migration_20261105_020000_workforce_cover.up, down: migration_20261105_020000_workforce_cover.down, name: '20261105_020000_workforce_cover' },
   { up: migration_20261116_170000_workforce_cover_v6_1.up, down: migration_20261116_170000_workforce_cover_v6_1.down, name: '20261116_170000_workforce_cover_v6_1' },
+  { up: migration_20261118_181826_scheduled_posts.up, down: migration_20261118_181826_scheduled_posts.down, name: '20261118_181826_scheduled_posts' },
 ];

@@ -91,6 +91,10 @@ export default buildConfig({
   csrf: ['https://ecofocusresearch.netlify.app', 'http://localhost:3000'],
   defaultDepth: 2,
 
+  jobs: {
+    autoRun: [{ cron: '* * * * *', queue: 'default' }],
+  },
+
   collections: [
     Users,
     CaseStudyDownloads,
