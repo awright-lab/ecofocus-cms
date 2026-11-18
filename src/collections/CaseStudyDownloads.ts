@@ -15,7 +15,7 @@ export const CaseStudyDownloads: CollectionConfig = {
   slug: 'case-study-downloads',
   labels: { singular: 'Case Study Download', plural: 'Case Study Downloads' },
   admin: {
-    useAsTitle: 'email', group: 'Research',
+    useAsTitle: 'email', group: 'Reports & Sales',
     defaultColumns: ['firstName', 'lastName', 'email', 'caseStudy', 'createdAt'],
     description: 'PDF download requests only. These records do not subscribe anyone to marketing. Repeat requests are recorded separately.',
     components: { beforeListTable: [{ path: 'src/ui/admin/CaseStudyDownloadsExport.tsx' }] },

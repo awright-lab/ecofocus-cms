@@ -1,12 +1,5 @@
-import * as React from 'react'
 import Image from 'next/image'
 
-const EcoFocusLogo: React.FC = () => {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <Image src="/ecofocus-logo.svg" alt="EcoFocus" width={120} height={28} priority />
-    </div>
-  )
+export default function EcoFocusLogo() {
+  return <div className="ef-brand-logo"><Image src="/brand/ecofocus-wordmark.webp" alt="EcoFocus Research" width={240} height={44} priority unoptimized /></div>
 }
-
-export default EcoFocusLogo

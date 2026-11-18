@@ -8,7 +8,7 @@ const editor = ({ req }: { req: { user?: unknown } }) => {
 
 export const Reports: CollectionConfig = {
   slug: 'reports',
-  admin: { useAsTitle: 'title', group: 'Store', defaultColumns: ['title', 'access', 'price', '_status', 'updatedAt'] },
+  admin: { useAsTitle: 'title', group: 'Reports & Sales', defaultColumns: ['title', 'access', 'price', '_status', 'updatedAt'] },
   versions: { drafts: true },
   access: {
     read: (args) => editor(args) || { _status: { equals: 'published' } },

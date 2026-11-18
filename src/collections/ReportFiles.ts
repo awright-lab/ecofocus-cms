@@ -4,7 +4,7 @@ const authenticated = ({ req }: { req: { user?: unknown } }) => Boolean(req.user
 
 export const ReportFiles: CollectionConfig = {
   slug: 'report-files',
-  admin: { useAsTitle: 'label', group: 'Store', description: 'Private purchased files. Requires a private REPORTS_S3_BUCKET.' },
+  admin: { useAsTitle: 'label', group: 'Reports & Sales', description: 'Private purchased files. Requires a private REPORTS_S3_BUCKET.' },
   access: { read: authenticated, create: authenticated, update: authenticated, delete: authenticated },
   upload: { mimeTypes: ['application/pdf', 'application/zip'], disableLocalStorage: true },
   hooks: { beforeOperation: [({ operation }) => {

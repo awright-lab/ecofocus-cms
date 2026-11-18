@@ -8,7 +8,7 @@ export const CTABanner: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'text',
-    group: 'Homepage',
+    group: 'Website Content',
   },
   fields: [
     { name: 'text', type: 'text' },

@@ -5,7 +5,7 @@ export const Media: CollectionConfig = {
   access: {
     read: () => true, // ✅ Allow public read
   },
-  admin: { group: 'Content' },
+  admin: { group: 'Media' },
   upload: {
     mimeTypes: ['image/*', 'video/*'], // Optional filter for allowed uploads
   },

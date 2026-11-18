@@ -5,7 +5,7 @@ export const ApiKeys: CollectionConfig = {
   slug: 'api-keys',
   admin: {
     useAsTitle: 'label',
-    group: 'Settings',
+    group: 'Administration',
   },
   access: {
     read: () => true, // or restrict to admins

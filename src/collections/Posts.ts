@@ -21,7 +21,7 @@ export const Posts: CollectionConfig = {
   versions: { drafts: { schedulePublish: true } },
   admin: {
     useAsTitle: 'title',
-    group: 'Content',
+    group: 'Website Content',
     defaultColumns: ['title', '_status', 'publishedAt'],
   },
 

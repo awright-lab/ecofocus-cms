@@ -5,7 +5,7 @@ import { slugify } from '../utils/slugify'
 export const Datasets: CollectionConfig = {
   slug: 'datasets',
   labels: { singular: 'Dataset', plural: 'Datasets' },
-  admin: { useAsTitle: 'title', group: 'Content' },
+  admin: { useAsTitle: 'title', group: 'Website Content' },
   access: {
     read: () => true, // public fetch OK (adjust if needed)
     create: ({ req }) => !!req.user,

@@ -8,7 +8,7 @@ export const QuickStats: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'id',
-    group: 'Homepage',
+    group: 'Website Content',
   },
   fields: [
     {

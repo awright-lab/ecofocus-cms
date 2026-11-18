@@ -4,7 +4,7 @@ import { slugify } from '../utils/slugify'
 export const Topics: CollectionConfig = {
   slug: 'topics',
   labels: { singular: 'Topic', plural: 'Topics' },
-  admin: { useAsTitle: 'label', group: 'Content' },
+  admin: { useAsTitle: 'label', group: 'Website Content' },
   access: { read: () => true },
   fields: [
     { name: 'label', type: 'text', required: true, unique: true, admin: { description: 'The tag shown to readers, e.g. “Sustainability”.' } },

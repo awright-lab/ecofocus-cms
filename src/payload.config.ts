@@ -81,10 +81,14 @@ const previewTokenHandler = async (...args: unknown[]) => {
 export default buildConfig({
   admin: {
     user: Users.slug,
-    meta: { titleSuffix: ' • EcoFocus CMS' },
+    theme: 'light',
+    meta: { titleSuffix: ' • EcoFocus Content & Reports', icons: { icon: [{ url: '/favicon.svg?v=ef-workspace-2026', type: 'image/svg+xml' }, { url: '/favicon.ico?v=ef-workspace-2026', sizes: 'any' }], apple: '/brand/apple-touch-icon.png' } },
     components: {
-      graphics: { Logo: { path: 'src/ui/admin/EcoFocusLogo.tsx' } },
-      beforeDashboard: [{ path: 'src/ui/admin/WelcomeDashboard.tsx' }],
+      graphics: { Logo: { path: 'src/ui/admin/EcoFocusLogo.tsx' }, Icon: { path: 'src/ui/admin/EcoFocusIcon.tsx' } },
+      beforeLogin: [{ path: 'src/ui/admin/LoginWelcome.tsx' }],
+      afterLogin: [{ path: 'src/ui/admin/LoginFooter.tsx' }],
+      beforeNavLinks: [{ path: 'src/ui/admin/WorkspaceNavBrand.tsx' }],
+      views: { dashboard: { Component: { path: 'src/ui/admin/WelcomeDashboard.tsx' } } },
     },
   },
 
@@ -98,16 +102,14 @@ export default buildConfig({
   },
 
   collections: [
-    Users,
-    CaseStudyDownloads,
     Reports,
     ReportOrders,
     ReportFiles,
-    Media, // 'media'
-    Authors, // 'authors'
-    Topics, // 'topics'
-    Datasets, // 'datasets'  <-- for ChartJS data references
-    Posts, // 'posts'
+    CaseStudyDownloads,
+    Posts,
+    Authors,
+    Topics,
+    Datasets,
     HeroSection,
     QuickStats,
     FeaturedReport,
@@ -116,6 +118,8 @@ export default buildConfig({
     WhyChoose,
     TrustedBy,
     CTABanner,
+    Media,
+    Users,
     ApiKeys,
   ],
 

@@ -4,7 +4,7 @@ import { slugify } from '../utils/slugify'
 export const Authors: CollectionConfig = {
   slug: 'authors',
   labels: { singular: 'Author', plural: 'Authors' },
-  admin: { useAsTitle: 'name', group: 'Content' },
+  admin: { useAsTitle: 'name', group: 'Website Content' },
   access: {
     read: () => true,
     create: ({ req }) => ['admin', 'editor'].includes(((req.user as any)?.role)),

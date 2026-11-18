@@ -8,7 +8,7 @@ export const FeaturedReport: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
-    group: 'Homepage',
+    group: 'Website Content',
   },
   fields: [
     { name: 'title', type: 'text', required: true },

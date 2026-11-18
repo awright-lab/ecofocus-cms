@@ -8,7 +8,7 @@ export const DashboardPromo: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'headline',
-    group: 'Homepage',
+    group: 'Website Content',
   },
   fields: [
     { name: 'headline', type: 'text' },

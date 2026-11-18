@@ -5,7 +5,7 @@ export const ReportOrders: CollectionConfig = {
   slug: 'report-orders',
   labels: { singular: 'Report Order', plural: 'Report Orders' },
   admin: {
-    useAsTitle: 'orderReference', group: 'Store',
+    useAsTitle: 'orderReference', group: 'Reports & Sales',
     defaultColumns: ['orderReference', 'buyerName', 'buyerEmail', 'reportsSummary', 'paidTotal', 'paymentStatus', 'orderDate', 'livemode', 'stripeDashboardUrl'],
     description: 'Verified Stripe report purchases. Read-only payment records; manage payments and refunds in Stripe. These buyers are not subscribed to marketing.',
     hidden: ({ user }) => !['admin', 'editor'].includes(String(user?.role)),

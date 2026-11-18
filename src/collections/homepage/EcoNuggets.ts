@@ -8,7 +8,7 @@ export const EcoNuggets: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'heading',
-    group: 'Homepage',
+    group: 'Website Content',
   },
   fields: [
     { name: 'heading', type: 'text' },

@@ -8,7 +8,7 @@ export const HeroSection: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'headline',
-    group: 'Homepage',
+    group: 'Website Content',
   },
   access: {
     read: () => true,
