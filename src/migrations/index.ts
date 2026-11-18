@@ -1,3 +1,4 @@
+import * as migration_20261118_200000_workforce_report_pdf from './20261118_200000_workforce_report_pdf';
 import * as migration_20261118_181826_scheduled_posts from './20261118_181826_scheduled_posts';
 import * as migration_20261116_170000_workforce_cover_v6_1 from './20261116_170000_workforce_cover_v6_1';
 import * as migration_20261105_020000_workforce_cover from './20261105_020000_workforce_cover';
@@ -106,4 +107,5 @@ export const migrations = [
   { up: migration_20261105_020000_workforce_cover.up, down: migration_20261105_020000_workforce_cover.down, name: '20261105_020000_workforce_cover' },
   { up: migration_20261116_170000_workforce_cover_v6_1.up, down: migration_20261116_170000_workforce_cover_v6_1.down, name: '20261116_170000_workforce_cover_v6_1' },
   { up: migration_20261118_181826_scheduled_posts.up, down: migration_20261118_181826_scheduled_posts.down, name: '20261118_181826_scheduled_posts' },
+  { up: migration_20261118_200000_workforce_report_pdf.up, down: migration_20261118_200000_workforce_report_pdf.down, name: '20261118_200000_workforce_report_pdf' },
 ];
