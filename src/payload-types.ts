@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     'case-study-downloads': CaseStudyDownload;
     reports: Report;
+    'report-orders': ReportOrder;
     'report-files': ReportFile;
     media: Media;
     authors: Author;
@@ -95,6 +96,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     'case-study-downloads': CaseStudyDownloadsSelect<false> | CaseStudyDownloadsSelect<true>;
     reports: ReportsSelect<false> | ReportsSelect<true>;
+    'report-orders': ReportOrdersSelect<false> | ReportOrdersSelect<true>;
     'report-files': ReportFilesSelect<false> | ReportFilesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
@@ -291,6 +293,71 @@ export interface ReportFile {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * Verified Stripe report purchases. Read-only payment records; manage payments and refunds in Stripe. These buyers are not subscribed to marketing.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "report-orders".
+ */
+export interface ReportOrder {
+  id: number;
+  orderReference: string;
+  buyerName?: string | null;
+  buyerEmail?: string | null;
+  reportsSummary?: string | null;
+  paidTotal: string;
+  paymentStatus: 'paid' | 'partially_refunded' | 'refunded';
+  /**
+   * Stripe payment charge date, or checkout creation date if unavailable.
+   */
+  orderDate: string;
+  livemode: boolean;
+  stripeDashboardUrl: string;
+  /**
+   * Unique checkout reference. Keep private.
+   */
+  stripeSessionId: string;
+  stripePaymentIntentId?: string | null;
+  stripeCustomerId?: string | null;
+  currency: string;
+  /**
+   * Minor currency units (cents for USD).
+   */
+  amountTotal: number;
+  /**
+   * Minor currency units (cents for USD).
+   */
+  amountTax: number;
+  /**
+   * Minor currency units (cents for USD).
+   */
+  amountDiscount: number;
+  /**
+   * Minor currency units (cents for USD).
+   */
+  amountRefunded: number;
+  reportIds:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  lineItems:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  lastSyncedAt: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -846,6 +913,10 @@ export interface PayloadLockedDocument {
         value: number | Report;
       } | null)
     | ({
+        relationTo: 'report-orders';
+        value: number | ReportOrder;
+      } | null)
+    | ({
         relationTo: 'report-files';
         value: number | ReportFile;
       } | null)
@@ -1018,6 +1089,34 @@ export interface ReportsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "report-orders_select".
+ */
+export interface ReportOrdersSelect<T extends boolean = true> {
+  orderReference?: T;
+  buyerName?: T;
+  buyerEmail?: T;
+  reportsSummary?: T;
+  paidTotal?: T;
+  paymentStatus?: T;
+  orderDate?: T;
+  livemode?: T;
+  stripeDashboardUrl?: T;
+  stripeSessionId?: T;
+  stripePaymentIntentId?: T;
+  stripeCustomerId?: T;
+  currency?: T;
+  amountTotal?: T;
+  amountTax?: T;
+  amountDiscount?: T;
+  amountRefunded?: T;
+  reportIds?: T;
+  lineItems?: T;
+  lastSyncedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

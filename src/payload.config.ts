@@ -9,6 +9,8 @@ import { s3Storage } from '@payloadcms/storage-s3'
 
 import { CaseStudyDownloads } from './collections/CaseStudyDownloads'
 
+import { ReportOrders } from './collections/ReportOrders'
+
 import { Reports } from './collections/Reports'
 import { ReportFiles } from './collections/ReportFiles'
 
@@ -99,6 +101,7 @@ export default buildConfig({
     Users,
     CaseStudyDownloads,
     Reports,
+    ReportOrders,
     ReportFiles,
     Media, // 'media'
     Authors, // 'authors'
