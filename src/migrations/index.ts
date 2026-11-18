@@ -1,3 +1,4 @@
+import * as migration_20261118_250000_report_order_company from './20261118_250000_report_order_company';
 import * as migration_20261118_240000_report_orders from './20261118_240000_report_orders';
 import * as migration_20261118_230000_retire_test_report from './20261118_230000_retire_test_report';
 import * as migration_20261118_220000_workforce_checkout_discount from './20261118_220000_workforce_checkout_discount';
@@ -116,4 +117,5 @@ export const migrations = [
   { up: migration_20261118_220000_workforce_checkout_discount.up, down: migration_20261118_220000_workforce_checkout_discount.down, name: '20261118_220000_workforce_checkout_discount' },
   { up: migration_20261118_230000_retire_test_report.up, down: migration_20261118_230000_retire_test_report.down, name: '20261118_230000_retire_test_report' },
   { up: migration_20261118_240000_report_orders.up, down: migration_20261118_240000_report_orders.down, name: '20261118_240000_report_orders' },
+  { up: migration_20261118_250000_report_order_company.up, down: migration_20261118_250000_report_order_company.down, name: '20261118_250000_report_order_company' },
 ];

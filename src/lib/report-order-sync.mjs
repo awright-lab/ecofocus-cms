@@ -36,7 +36,9 @@ export async function getStripeReportOrder(sessionId, request) {
   const refunded = charge?.amount_refunded || 0
   const currency = String(session.currency || 'usd').toLowerCase()
   const format = amount => new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount / 100)
+  const company = session.custom_fields?.find(field => field.key === 'company_name' && field.type === 'text')?.text?.value
   return {
+    companyName: typeof company === 'string' ? company.trim() || null : null,
     orderReference: `EF-${session.id.slice(-10).toUpperCase()}`,
     stripeSessionId: session.id,
     stripePaymentIntentId: intent?.id || (typeof session.payment_intent === 'string' ? session.payment_intent : null),

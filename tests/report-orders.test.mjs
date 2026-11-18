@@ -84,8 +84,16 @@ test('the CMS endpoint denies anonymous access and ignores caller-supplied buyer
   assert.equal(collection.access.read({ req: { user: null } }), false)
   const endpoint = collection.endpoints[0].handler
   assert.equal((await endpoint({ user: null, json: () => assert.fail('Must authenticate first') })).status, 403)
-  const response = await endpoint({ user: { collection: 'users', role: 'editor' }, payload, json: async () => ({ sessionId: session.id, buyerEmail: 'attacker@example.test', amountTotal: 149500, paymentStatus: 'paid' }) })
+  const response = await endpoint({ user: { collection: 'users', role: 'editor' }, payload, json: async () => ({ sessionId: session.id, buyerEmail: 'attacker@example.test', companyName: 'Spoofed company', amountTotal: 149500, paymentStatus: 'paid' }) })
   assert.equal(response.status, 200)
   assert.equal([...payload.docs.values()][0].buyerEmail, 'buyer@example.test')
   assert.equal([...payload.docs.values()][0].amountTotal, 100)
+  assert.equal([...payload.docs.values()][0].companyName, null)
 })
+
+ test('company is taken only from the verified checkout field, with legacy orders left blank', async () => {
+  const order = await getStripeReportOrder(session.id, requestFor({ ...session, custom_fields: [{ key: 'company_name', type: 'text', text: { value: '  Example Company  ' } }] }))
+  assert.equal(order.companyName, 'Example Company')
+  assert.equal((await getStripeReportOrder(session.id, requestFor(session))).companyName, null)
+  assert.equal((await getStripeReportOrder(session.id, requestFor({ ...session, custom_fields: [{ key: 'other', type: 'text', text: { value: 'Unrelated' } }] }))).companyName, null)
+ })

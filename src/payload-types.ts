@@ -304,6 +304,10 @@ export interface ReportOrder {
   id: number;
   orderReference: string;
   buyerName?: string | null;
+  /**
+   * Company supplied at checkout. Older orders may not include this information.
+   */
+  companyName?: string | null;
   buyerEmail?: string | null;
   reportsSummary?: string | null;
   paidTotal: string;
@@ -1097,6 +1101,7 @@ export interface ReportsSelect<T extends boolean = true> {
 export interface ReportOrdersSelect<T extends boolean = true> {
   orderReference?: T;
   buyerName?: T;
+  companyName?: T;
   buyerEmail?: T;
   reportsSummary?: T;
   paidTotal?: T;

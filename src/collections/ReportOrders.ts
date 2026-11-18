@@ -6,7 +6,7 @@ export const ReportOrders: CollectionConfig = {
   labels: { singular: 'Report Order', plural: 'Report Orders' },
   admin: {
     useAsTitle: 'orderReference', group: 'Reports & Sales',
-    defaultColumns: ['orderReference', 'buyerName', 'buyerEmail', 'reportsSummary', 'paidTotal', 'paymentStatus', 'orderDate', 'livemode', 'stripeDashboardUrl'],
+    defaultColumns: ['orderReference', 'buyerName', 'companyName', 'buyerEmail', 'reportsSummary', 'paidTotal', 'paymentStatus', 'orderDate', 'livemode', 'stripeDashboardUrl'],
     description: 'Verified Stripe report purchases. Read-only payment records; manage payments and refunds in Stripe. These buyers are not subscribed to marketing.',
     hidden: ({ user }) => !['admin', 'editor'].includes(String(user?.role)),
   },
@@ -30,6 +30,7 @@ export const ReportOrders: CollectionConfig = {
   fields: [
     { name: 'orderReference', type: 'text', required: true, index: true, admin: { readOnly: true } },
     { name: 'buyerName', type: 'text', admin: { readOnly: true } },
+    { name: 'companyName', type: 'text', index: true, admin: { readOnly: true, description: 'Company supplied at checkout. Older orders may not include this information.' } },
     { name: 'buyerEmail', type: 'email', index: true, admin: { readOnly: true } },
     { name: 'reportsSummary', type: 'textarea', label: 'Reports purchased', admin: { readOnly: true } },
     { name: 'paidTotal', type: 'text', label: 'Amount paid', required: true, admin: { readOnly: true } },
