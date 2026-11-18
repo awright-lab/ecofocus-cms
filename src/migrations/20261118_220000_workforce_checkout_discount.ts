@@ -29,6 +29,7 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
     'applies_to[products][0]': report.stripeProductId,
     'metadata[purpose]': 'temporary-live-checkout-test-v2',
   })
+  coupon = await request(`coupons/${encodeURIComponent(couponID)}?expand[]=applies_to`)
   if (!coupon.valid || !coupon.applies_to?.products?.includes(report.stripeProductId)) throw new Error('The test coupon must be valid and restricted to the workforce report.')
   const promotions = await request(`promotion_codes?coupon=${encodeURIComponent(couponID)}&limit=1`)
   if (!promotions.data.length) await request('promotion_codes', {
