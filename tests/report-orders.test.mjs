@@ -92,7 +92,7 @@ test('the CMS endpoint denies anonymous access and ignores caller-supplied buyer
 })
 
  test('company is taken only from the verified checkout field, with legacy orders left blank', async () => {
-  const order = await getStripeReportOrder(session.id, requestFor({ ...session, custom_fields: [{ key: 'company_name', type: 'text', text: { value: '  Example Company  ' } }] }))
+  const order = await getStripeReportOrder(session.id, requestFor({ ...session, custom_fields: [{ key: 'companyName', type: 'text', text: { value: '  Example Company  ' } }] }))
   assert.equal(order.companyName, 'Example Company')
   assert.equal((await getStripeReportOrder(session.id, requestFor(session))).companyName, null)
   assert.equal((await getStripeReportOrder(session.id, requestFor({ ...session, custom_fields: [{ key: 'other', type: 'text', text: { value: 'Unrelated' } }] }))).companyName, null)
