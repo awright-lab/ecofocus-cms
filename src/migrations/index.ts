@@ -1,3 +1,4 @@
+import * as migration_20261118_230000_retire_test_report from './20261118_230000_retire_test_report';
 import * as migration_20261118_220000_workforce_checkout_discount from './20261118_220000_workforce_checkout_discount';
 import * as migration_20261118_210000_publish_workforce_report from './20261118_210000_publish_workforce_report';
 import * as migration_20261118_200000_workforce_report_pdf from './20261118_200000_workforce_report_pdf';
@@ -112,4 +113,5 @@ export const migrations = [
   { up: migration_20261118_200000_workforce_report_pdf.up, down: migration_20261118_200000_workforce_report_pdf.down, name: '20261118_200000_workforce_report_pdf' },
   { up: migration_20261118_210000_publish_workforce_report.up, down: migration_20261118_210000_publish_workforce_report.down, name: '20261118_210000_publish_workforce_report' },
   { up: migration_20261118_220000_workforce_checkout_discount.up, down: migration_20261118_220000_workforce_checkout_discount.down, name: '20261118_220000_workforce_checkout_discount' },
+  { up: migration_20261118_230000_retire_test_report.up, down: migration_20261118_230000_retire_test_report.down, name: '20261118_230000_retire_test_report' },
 ];
