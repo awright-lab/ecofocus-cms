@@ -97,3 +97,12 @@ test('the CMS endpoint denies anonymous access and ignores caller-supplied buyer
   assert.equal((await getStripeReportOrder(session.id, requestFor(session))).companyName, null)
   assert.equal((await getStripeReportOrder(session.id, requestFor({ ...session, custom_fields: [{ key: 'other', type: 'text', text: { value: 'Unrelated' } }] }))).companyName, null)
  })
+
+test('complimentary checkouts are recorded only after a zero-total payment-mode checkout completes', async () => {
+ const free = { ...session, mode: 'payment', payment_status: 'no_payment_required', amount_total: 0, payment_intent: null };
+ const order = await getStripeReportOrder(free.id, requestFor(free));
+ assert.equal(order.amountTotal, 0);
+ assert.equal(order.paidTotal, '$0.00 USD');
+ assert.equal(order.stripePaymentIntentId, null);
+ for (const change of [{ amount_total: 100 }, { amount_total: null }, { status: 'open' }, { mode: 'setup' }, { payment_status: 'unpaid' }]) await assert.rejects(getStripeReportOrder(free.id, requestFor({ ...free, ...change })));
+});

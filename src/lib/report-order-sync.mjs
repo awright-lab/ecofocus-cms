@@ -17,7 +17,7 @@ export function stripeRequest({ secret = process.env.STRIPE_SECRET_KEY, fetcher 
 export async function getStripeReportOrder(sessionId, request) {
   if (typeof sessionId !== 'string' || !/^cs_(test_|live_)?[a-zA-Z0-9]+$/.test(sessionId)) throw new Error('Invalid checkout session.')
   const session = await request(`checkout/sessions/${encodeURIComponent(sessionId)}?expand[]=payment_intent.latest_charge`)
-  if (session.metadata?.source !== 'report-store' || session.status !== 'complete' || session.payment_status !== 'paid') {
+  if (session.metadata?.source !== 'report-store' || session.status !== 'complete' || !(session.payment_status === 'paid' || (session.payment_status === 'no_payment_required' && session.amount_total === 0 && session.mode === 'payment'))) {
     throw new Error('Only confirmed paid report orders can be recorded.')
   }
   const ids = JSON.parse(session.metadata.report_ids || '[]')
@@ -83,7 +83,7 @@ export async function backfillReportOrders(payload, request, req) {
   do {
     const page = await request(`checkout/sessions?status=complete&limit=100${after ? `&starting_after=${encodeURIComponent(after)}` : ''}`)
     for (const session of page.data) {
-      if (session.metadata?.source !== 'report-store' || session.payment_status !== 'paid') continue
+      if (session.metadata?.source !== 'report-store' || !(session.payment_status === 'paid' || (session.payment_status === 'no_payment_required' && session.amount_total === 0 && session.mode === 'payment'))) continue
       await saveReportOrder(payload, await getStripeReportOrder(session.id, request), req)
       count++
     }
